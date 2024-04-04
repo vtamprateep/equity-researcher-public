@@ -1,3 +1,4 @@
+META
 AAPL  
 MSFT  
 GOOGL  
@@ -8,4 +9,3 @@ OSCR
 NVDA  
 SPY
 IWM
-VIX
