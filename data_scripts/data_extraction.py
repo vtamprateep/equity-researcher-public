@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 from fmp import FinancialModelingPrepAPI
 
 import os
-import datetime
 import json
 import pathlib
 import time
@@ -18,23 +17,19 @@ if __name__ == "__main__":
     load_dotenv() 
     FMP_API_KEY = os.getenv("FMP_API_KEY")
     fmp_engine = FinancialModelingPrepAPI(FMP_API_KEY)
-    ticker_list = []
-
-    with open("./ticker_list.txt", "r") as ticker_list_file:
-        text_lines = ticker_list_file.readlines()
-        ticker_list = [x.strip() for x in text_lines]
+    ticker_list = ["TSLA", "GOOGL", "OSCR", "MSFT", "SPY", "AMZN", "META", "NVDA", "AAPL", "IWM"]
 
     ###### Get 1 year historical charts
-    # end_date = datetime.date.today()
-    # start_date = datetime.date(end_date.year - 1, end_date.month, end_date.day)
+    end_date = datetime.date.today()
+    start_date = datetime.date(end_date.year - 1, end_date.month, end_date.day)
     
-    # for ticker in ticker_list:
-    #     write_dest_path = pathlib.Path(f"../data/raw/charts/{ticker.lower()}_charts.txt")
-    #     data_result = fmp_engine.get_eod_charts_data(ticker, start_date, end_date)
-    #     with open(write_dest_path, "w") as dest_file:
-    #         json.dump(data_result, dest_file)
+    for ticker in ticker_list:
+        write_dest_path = pathlib.Path(f"../data/raw/charts/{ticker.lower()}_charts.txt")
+        data_result = fmp_engine.get_eod_charts_data(ticker, start_date, end_date)
+        with open(write_dest_path, "w") as dest_file:
+            json.dump(data_result, dest_file)
 
-    #     time.sleep(0.25)
+        time.sleep(0.25)
 
     ###### Get latest annual financial statement data
     # Balance sheet statement

@@ -190,53 +190,53 @@ if __name__ == "__main__":
     df.to_csv(dest_path.joinpath("income_statement.csv"), index=False)
 
     ###### Clean and format cashflow statement
-    # source_path = pathlib.Path("../data/raw/cashflow_statement/")
-    # dest_path = pathlib.Path("../data/clean/cashflow_statement/")
-    # if not dest_path.exists(): dest_path.mkdir(parents=True, exist_ok=True)
-    # source_path_list = list(source_path.iterdir())
+    source_path = pathlib.Path("../data/raw/cashflow_statement/")
+    dest_path = pathlib.Path("../data/clean/cashflow_statement/")
+    if not dest_path.exists(): dest_path.mkdir(parents=True, exist_ok=True)
+    source_path_list = list(source_path.iterdir())
 
-    # column_mapper = {
-    #     "date": "date",
-    #     "symbol": "symbol",
-    #     "reportedCurrency": "reported_currency",
-    #     "cik": "cik",
-    #     "fillingDate": "filling_date",
-    #     "acceptedDate": "accepted_date",
-    #     "calendarYear": "calendar_year",
-    #     "period": "period",
-    #     "netIncome": "net_income",
-    #     "depreciationAndAmortization": "depreciation_and_amortization",
-    #     "deferredIncomeTax": "deferred_income_tax",
-    #     "stockBasedCompensation": "stock_based_compensation",
-    #     "changeInWorkingCapital": "change_in_working_capital",
-    #     "accountsReceivables": "accounts_receivables",
-    #     "inventory": "inventory",
-    #     "accountsPayables": "accounts_payables",
-    #     "otherWorkingCapital": "other_working_capital",
-    #     "otherNonCashItems": "other_non_cash_items",
-    #     "netCashProvidedByOperatingActivities": "net_cash_provided_by_operating_activities",
-    #     "investmentsInPropertyPlantAndEquipment": "investments_in_property_plant_and_equipment",
-    #     "acquisitionsNet": "acquisitions_net",
-    #     "purchasesOfInvestments": "purchases_of_investments",
-    #     "salesMaturitiesOfInvestments": "sales_maturities_of_investments",
-    #     "otherInvestingActivites": "other_investing_activites",
-    #     "netCashUsedForInvestingActivites": "net_cash_used_for_investing_activites",
-    #     "debtRepayment": "debt_repayment",
-    #     "commonStockIssued": "common_stock_issued",
-    #     "commonStockRepurchased": "common_stock_repurchased",
-    #     "dividendsPaid": "dividends_paid",
-    #     "otherFinancingActivites": "other_financing_activites",
-    #     "netCashUsedProvidedByFinancingActivities": "net_cash_used_provided_by_financing_activities",
-    #     "effectOfForexChangesOnCash": "effect_of_forex_changes_on_cash",
-    #     "netChangeInCash": "net_change_in_cash",
-    #     "cashAtEndOfPeriod": "cash_at_end_of_period",
-    #     "cashAtBeginningOfPeriod": "cash_at_beginning_of_period",
-    #     "operatingCashFlow": "operating_cash_flow",
-    #     "capitalExpenditure": "capital_expenditure",
-    #     "freeCashFlow": "free_cash_flow",
-    #     "link": "link",
-    #     "finalLink": "final_link"
-    # }
-    # df = load_consolidate(source_path_list, statements_to_df)
-    # df.rename(columns=column_mapper, inplace=True)
-    # df.to_csv(dest_path.joinpath("cashflow_statement.csv"), index=False)
+    column_mapper = {
+        "date": "date",
+        "symbol": "symbol",
+        "reportedCurrency": "reported_currency",
+        "cik": "cik",
+        "fillingDate": "filling_date",
+        "acceptedDate": "accepted_date",
+        "calendarYear": "calendar_year",
+        "period": "period",
+        "netIncome": "net_income",
+        "depreciationAndAmortization": "depreciation_and_amortization",
+        "deferredIncomeTax": "deferred_income_tax",
+        "stockBasedCompensation": "stock_based_compensation",
+        "changeInWorkingCapital": "change_in_working_capital",
+        "accountsReceivables": "accounts_receivables",
+        "inventory": "inventory",
+        "accountsPayables": "accounts_payables",
+        "otherWorkingCapital": "other_working_capital",
+        "otherNonCashItems": "other_non_cash_items",
+        "netCashProvidedByOperatingActivities": "net_cash_provided_by_operating_activities",
+        "investmentsInPropertyPlantAndEquipment": "investments_in_property_plant_and_equipment",
+        "acquisitionsNet": "acquisitions_net",
+        "purchasesOfInvestments": "purchases_of_investments",
+        "salesMaturitiesOfInvestments": "sales_maturities_of_investments",
+        "otherInvestingActivites": "other_investing_activites",
+        "netCashUsedForInvestingActivites": "net_cash_used_for_investing_activites",
+        "debtRepayment": "debt_repayment",
+        "commonStockIssued": "common_stock_issued",
+        "commonStockRepurchased": "common_stock_repurchased",
+        "dividendsPaid": "dividends_paid",
+        "otherFinancingActivites": "other_financing_activites",
+        "netCashUsedProvidedByFinancingActivities": "net_cash_used_provided_by_financing_activities",
+        "effectOfForexChangesOnCash": "effect_of_forex_changes_on_cash",
+        "netChangeInCash": "net_change_in_cash",
+        "cashAtEndOfPeriod": "cash_at_end_of_period",
+        "cashAtBeginningOfPeriod": "cash_at_beginning_of_period",
+        "operatingCashFlow": "operating_cash_flow",
+        "capitalExpenditure": "capital_expenditure",
+        "freeCashFlow": "free_cash_flow",
+        "link": "link",
+        "finalLink": "final_link"
+    }
+    df = load_consolidate(source_path_list, statements_to_df)
+    df.rename(columns=column_mapper, inplace=True)
+    df.to_csv(dest_path.joinpath("cashflow_statement.csv"), index=False)
