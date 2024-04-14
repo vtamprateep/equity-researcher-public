@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const config = {
     env: {
         SERVER_HOST: "localhost",
         SERVER_PORT: "8080"
     }
 };
 
-export default nextConfig;
+export default config;
