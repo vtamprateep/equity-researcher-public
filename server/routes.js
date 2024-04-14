@@ -41,6 +41,7 @@ const getCharts = async function (req, res) {
         FROM charts
         WHERE symbol_id = ${pathParams.symbol_id}
             AND close_date BETWEEN ${startDate} AND ${endDate}
+        ORDER BY 1
     `.then((result) => res.send(result));
 };
 
