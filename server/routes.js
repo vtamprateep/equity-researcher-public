@@ -1,15 +1,14 @@
-const postgres = require('postgres');
+const { Pool } = require('pg');
 const config = require('./config.json');
-const { query } = require('express');
 
 
-const psql = postgres({
+// Create client and connect
+const pgPool = new Pool({
     host: config.host,
-    username: config.user,
+    user: config.user,
     password: config.pass,
     port: config.port,
-    database: config.db,
-    multipleStatements : true
+    database: config.db
 });
 
 /* Route to get daily charts data. Would be cool to increase / decrease granularity by week / month */
@@ -34,22 +33,22 @@ const getCharts = async function (req, res) {
     }
 
     // Execute query and return
-    psql`
+    pgPool.query(`
         SELECT
             close_date,
             adj_close
         FROM charts
         WHERE symbol_id = ${pathParams.symbol_id}
-            AND close_date BETWEEN ${startDate} AND ${endDate}
+            AND close_date BETWEEN '${startDate}' AND '${endDate}'
         ORDER BY 1
-    `.then((result) => res.send(result));
+    `).then((result) => res.send(result));
 };
 
 const getProfile = async function (req, res) {
     const pathParams = req.params;
 
     // Execute query and return
-    psql`
+    pgPool.query(`
         SELECT
             symbol,
             company_name,
@@ -76,10 +75,22 @@ const getProfile = async function (req, res) {
             is_fund
         FROM symbol
         WHERE id = ${pathParams.id}
-    `.then((result) => res.send(result));
+    `).then((result) => res.send(result));
 };
+
+const getSymbolId = function(req, res) {
+    const pathParams = req.params;
+
+    pgPool.query(`
+        SELECT
+            id
+        FROM symbol
+        WHERE symbol = '${pathParams.symbol}'
+    `).then((result) => res.send(result));
+}
 
 module.exports = {
     getCharts,
-    getProfile
+    getProfile,
+    getSymbolId
 }
