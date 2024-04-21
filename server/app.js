@@ -12,7 +12,7 @@ app.use(bp.urlencoded({ extended: true }));
 
 // routes here
 app.get("/get_charts/:symbol_id", routes.getCharts);
-app.get("/get_profile/:id", routes.getProfile);
 app.get("/get_symbolid/:symbol", routes.getSymbolId);
+app.get("/get_parent_id/:symbol_id", routes.getParentId);
 
 module.exports = app;

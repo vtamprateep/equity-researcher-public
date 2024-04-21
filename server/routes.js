@@ -44,40 +44,6 @@ const getCharts = async function (req, res) {
     `).then((result) => res.send(result));
 };
 
-const getProfile = async function (req, res) {
-    const pathParams = req.params;
-
-    // Execute query and return
-    pgPool.query(`
-        SELECT
-            symbol,
-            company_name,
-            currency,
-            cik,
-            isin,
-            cusip,
-            exchange,
-            exchange_short_name,
-            industry,
-            website,
-            description,
-            ceo,
-            sector,
-            country,
-            phone,
-            address,
-            city,
-            state,
-            ipo_date,
-            is_etf,
-            is_actively_trading,
-            is_adr,
-            is_fund
-        FROM symbol
-        WHERE id = ${pathParams.id}
-    `).then((result) => res.send(result));
-};
-
 const getSymbolId = function(req, res) {
     const pathParams = req.params;
 
@@ -89,8 +55,19 @@ const getSymbolId = function(req, res) {
     `).then((result) => res.send(result));
 }
 
+const getParentId = function(req, res) {
+    const pathParams = req.params;
+
+    pgPool.query(`
+        SELECT
+            parent_symbol_id
+        FROM hierarchy
+        WHERE symbol_id = ${pathParams.symbol_id}
+    `).then((result) => res.send(result));
+}
+
 module.exports = {
     getCharts,
-    getProfile,
-    getSymbolId
+    getSymbolId,
+    getParentId
 }
