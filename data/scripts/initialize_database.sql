@@ -18,6 +18,21 @@ CREATE TABLE charts (
     adj_close DOUBLE PRECISION
 );
 
+/* Create holdings table if doesn't exist */
+DROP TABLE IF EXISTS holdings;
+CREATE TABLE holdings (
+    holding_symbol_id INTEGER REFERENCES symbol(id),
+    symbol_id INTEGER REFERENCES symbol(id)
+);
+
+/* Create hierarchy table if doesn't exist */
+DROP TABLE IF EXISTS hierarchy;
+CREATE TABLE hierarchy (
+    symbol_id INTEGER REFERENCES symbol(id),
+    "type" VARCHAR(20),
+    parent_symbol_id INTEGER REFERENCES symbol(id)
+);
+
 /* Load data into symbol */
 COPY symbol FROM '/Users/vtamprateep/Documents/GitHub/value-investing-research-platform/data_scripts/symbol.csv' DELIMITER ',' CSV HEADER;
 
