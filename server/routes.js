@@ -35,9 +35,11 @@ const getCharts = async function (req, res) {
     // Execute query and return
     pgPool.query(`
         SELECT
+            symbol.symbol,
             close_date,
             adj_close
         FROM charts
+            LEFT JOIN symbol ON charts.symbol_id = symbol.id
         WHERE symbol_id = ${pathParams.symbol_id}
             AND close_date BETWEEN '${startDate}' AND '${endDate}'
         ORDER BY 1
