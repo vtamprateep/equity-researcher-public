@@ -9,7 +9,6 @@ export function SymbolProfile({symbolId}: {symbolId: number | undefined}) {
     // const [curSymbolId, setCurSymbolId] = useState<number | undefined>(symbolId);
   
     useEffect(() => {
-        console.log("SymbolProfile updated.");
         if (symbolId != undefined) {
             fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_profile/${symbolId}`, {
                 method: "GET",
@@ -19,7 +18,6 @@ export function SymbolProfile({symbolId}: {symbolId: number | undefined}) {
             .then((res_data: any) => {
                 setProfileData(res_data.rows[0]);
             })
-            
         }
         
     }, [symbolId]);
@@ -32,29 +30,88 @@ export function SymbolProfile({symbolId}: {symbolId: number | undefined}) {
 }
 
 export function PriceChart({symbolId}: {symbolId: number | undefined}) {
-    const [chartData, setChartData] = useState<ChartData>({ labels: [], datasets: [] });
-    // const [curSymbolId, setCurSymbolId] = useState<number | undefined>(symbolId);
+    const [chartData, setChartData] = useState<ChartData[]>([]);
+    const chartOptions = {
+        x: {
+            type: "time",
+            time: {
+                unit: "day"
+            },
+            title: {
+                display: true,
+                text: "Date"
+            }
+        },
+        y: {
+            title: {
+                display: true,
+                text: "Adjusted Close"
+            }
+        }
+    };
+
+    const updateChartsData = async (symbolId: number): Promise<void> => { // Pull charts data down from server and update state
+        fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_charts/${symbolId}`, {
+            method: "GET",
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then((res) => res.json())
+            .then((res_data: any) => {
+                let newDataEntry = {
+                    symbol: res_data.rows[0].symbol,
+                    data: res_data.rows.map((entry: RouteGetChartsEntry) => { return {close_date: entry.close_date, adj_close: entry.adj_close} })
+                }
+                console.log(newDataEntry);
+                setChartData(prevChartData => [...prevChartData, newDataEntry]);
+            })
+            .catch(error => {
+                console.log("Error fetching or processing data:", error);
+            });
+    }
+
+    const searchParent = async function(symbolId: number) { // Given symbol ID, see if there is a parent
+        return fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_parent_id/${symbolId}`, {
+            method: "GET",
+            headers: { 'Content-Type': 'application/json' }
+        })
+            .then((res) => res.json())
+            .then((res_data: any) => {
+                if (res_data.rows.length != 0) {
+                    return res_data.rows[0].parent_symbol_id;
+                } else { return undefined }
+            })
+    }
+
+    const formatChartsData = (data: ChartData[]) => { // Format data to be put into Chart.js component
+        if (data.length == 0) { return [] }
+
+        let outputChartData = {
+            labels: data[0].data.map(row => row.close_date.slice(0, 10)),
+            datasets: data.map(entry => {
+                return {
+                    label: entry.symbol,
+                    data: entry.data.map((row: any) => row.adj_close),
+                    borderColor: "red",
+                    fill: false
+                }
+            })
+        }
+
+        return outputChartData
+    }
     
     useEffect(() => {
         if (symbolId != undefined) {
-            fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_charts/${symbolId}`, {
-                method: "GET",
-                headers: { 'Content-Type': 'application/json' },
-            })
-            .then((res) => res.json())
-            .then((res_data: any) => {
-                setChartData({
-                    labels: res_data.rows.map((row: any) => row.close_date.slice(0, 10)),
-                    datasets: [{
-                        label: "Adjusted Close Price",
-                        data: res_data.rows.map((row: any) => row.adj_close)
-                    }]
-                });
-            }).catch(error => {console.log("Error fetching or processing data:", error)});
+            // Search for parent, if exists get series data
+            searchParent(symbolId)
+                .then(parentSymbolId => {
+                    if (parentSymbolId !== undefined) { updateChartsData(parentSymbolId) }
+                })
+                .finally(() => { updateChartsData(symbolId) }) // Pull data for stock in focus
         }
     }, [symbolId]);
     
-    if (symbolId != undefined) {
-        return <Chart type="line" data={chartData} />;
+    if (symbolId != undefined && chartData.length != 0) {
+        return <Chart type="line" data={formatChartsData(chartData)} />;
     }
 }

@@ -2,9 +2,17 @@ export {}
 
 declare global {
     interface ChartData {
-        labels: string[],
-        datasets: {label: string, data: number[]}[]
+        symbol: string,
+        data: {close_date: string, adj_close: number}[]
     }
+
+    // Server Route Output Types
+    interface RouteGetChartsEntry {
+        symbol: string;
+        close_date: string;
+        adj_close: number;
+    }
+
     interface ProfileData {
         symbol: string,
         company_name: string,
