@@ -50,23 +50,25 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
         }
     };
 
-    const updateChartsData = async (symbolId: number): Promise<void> => { // Pull charts data down from server and update state
-        fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_charts/${symbolId}`, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' },
-        })
-            .then((res) => res.json())
-            .then((res_data: any) => {
-                let newDataEntry = {
-                    symbol: res_data.rows[0].symbol,
-                    data: res_data.rows.map((entry: RouteGetChartsEntry) => { return {close_date: entry.close_date, adj_close: entry.adj_close} })
-                }
-                console.log(newDataEntry);
-                setChartData(prevChartData => [...prevChartData, newDataEntry]);
+    const updateChartsData = async (symbolIdArray: number[]): Promise<void> => { // Pull charts data down from server and update state
+        symbolIdArray.forEach((symbolId) => {
+            fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_charts/${symbolId}`, {
+                method: "GET",
+                headers: { 'Content-Type': 'application/json' },
             })
-            .catch(error => {
-                console.log("Error fetching or processing data:", error);
-            });
+                .then((res) => res.json())
+                .then((res_data: any) => {
+                    let newDataEntry = {
+                        symbol: res_data.rows[0].symbol,
+                        data: res_data.rows.map((entry: RouteGetChartsEntry) => { return {close_date: entry.close_date, adj_close: entry.adj_close} })
+                    }
+                    console.log(newDataEntry);
+                    setChartData(prevChartData => [...prevChartData, newDataEntry]);
+                })
+                .catch(error => {
+                    console.log("Error fetching or processing data:", error);
+                });
+        })
     }
 
     const searchParent = async function(symbolId: number) { // Given symbol ID, see if there is a parent
@@ -83,7 +85,9 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     }
 
     const formatChartsData = (data: ChartData[]) => { // Format data to be put into Chart.js component
-        if (data.length == 0) { return [] }
+        if (data.length == 0) { // Base case
+            return { labels: [], datasets: [] }
+        }
 
         let outputChartData = {
             labels: data[0].data.map(row => row.close_date.slice(0, 10)),
@@ -105,9 +109,8 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
             // Search for parent, if exists get series data
             searchParent(symbolId)
                 .then(parentSymbolId => {
-                    if (parentSymbolId !== undefined) { updateChartsData(parentSymbolId) }
+                    parentSymbolId ? updateChartsData([symbolId, parentSymbolId]) : updateChartsData([symbolId]);
                 })
-                .finally(() => { updateChartsData(symbolId) }) // Pull data for stock in focus
         }
     }, [symbolId]);
     
