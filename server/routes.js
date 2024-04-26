@@ -43,7 +43,12 @@ const getCharts = async function (req, res) {
         WHERE symbol_id = ${pathParams.symbol_id}
             AND close_date BETWEEN '${startDate}' AND '${endDate}'
         ORDER BY 1
-    `).then((result) => res.send(result));
+    `)
+        .then((result) => res.send(result))
+        .catch((error) => {
+            console.error("Error executing query:", error);
+            res.status(500).send("Internal Server Error.");
+        });
 };
 
 const getSymbolId = function(req, res) {
@@ -54,7 +59,12 @@ const getSymbolId = function(req, res) {
             id
         FROM symbol
         WHERE symbol = '${pathParams.symbol}'
-    `).then((result) => res.send(result));
+    `)
+        .then((result) => res.send(result))
+        .catch((error) => {
+            console.error("Error executing query:", error);
+            res.status(500).send("Internal Server Error.");
+        });;
 }
 
 const getParentId = function(req, res) {
@@ -65,11 +75,47 @@ const getParentId = function(req, res) {
             parent_symbol_id
         FROM hierarchy
         WHERE symbol_id = ${pathParams.symbol_id}
-    `).then((result) => res.send(result));
+    `)
+        .then((result) => res.send(result))
+        .catch((error) => {
+            console.error("Error executing query:", error);
+            res.status(500).send("Internal Server Error.");
+        });
+}
+
+/**
+ * Return financial line items from database `financials` table
+ * Path Params: symbol_id
+ * @param {*} req 
+ * @param {*} res 
+ */
+const getTTMDilutedEPS = function(req, res) {
+    const pathParams = req.params;
+
+    pgPool.query(`
+        SELECT
+            symbol.symbol,
+            item,
+            value, 
+            quarter_ending_on
+        FROM financials
+            LEFT JOIN symbol 
+                ON financials.symbol_id = symbol.id
+        WHERE symbol_id = ${pathParams.symbol_id}
+            AND item = 'Diluted EPS'
+        ORDER BY 4 DESC
+        LIMIT 4
+    `)
+        .then((result) => res.send(result))
+        .catch((error) => {
+            console.error("Error executing query:", error);
+            res.status(500).send("Internal Server Error.");
+        });
 }
 
 module.exports = {
     getCharts,
     getSymbolId,
-    getParentId
+    getParentId,
+    getTTMDilutedEPS
 }
