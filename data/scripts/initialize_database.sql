@@ -33,6 +33,15 @@ CREATE TABLE hierarchy (
     parent_symbol_id INTEGER REFERENCES symbol(id)
 );
 
+/* Create financials table if doesn't exist */
+DROP TABLE IF EXISTS financials;
+CREATE TABLE financials (
+    symbol_id INTEGER REFERENCES symbol(id),
+    item VARCHAR(20),
+    "value" DECIMAL(15, 2),
+    quarter_ending_on DATE
+);
+
 /* Load data into symbol */
 COPY symbol FROM '/Users/vtamprateep/Documents/GitHub/value-investing-research-platform/data_scripts/symbol.csv' DELIMITER ',' CSV HEADER;
 
