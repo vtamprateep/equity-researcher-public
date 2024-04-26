@@ -3,54 +3,86 @@ import 'chart.js/auto';
 import { useEffect, useState } from 'react';
 import config from "../next.config.mjs";
 
+import { parse } from "date-fns";
+import 'chartjs-adapter-date-fns';
 
-export function SymbolProfile({symbolId}: {symbolId: number | undefined}) {
-    const [profileData, setProfileData] = useState<ProfileData>();
-    // const [curSymbolId, setCurSymbolId] = useState<number | undefined>(symbolId);
-  
+
+export function RatioTable({symbolId}: {symbolId: number | undefined}) {
+    const [ratioData, setRatioData] = useState<any>({});
+
+    const getTTMDilutedEPS = async function(symbolId: number) {
+        return fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_ttm_diluted_eps/${symbolId}`, {
+            method: "GET",
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then(res => res.json())
+            .then(res_data => res_data.rows);
+    }
+
     useEffect(() => {
-        if (symbolId != undefined) {
-            fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_profile/${symbolId}`, {
-                method: "GET",
-                headers: { 'Content-Type': 'application/json' },
-            })
-            .then((res) => res.json())
-            .then((res_data: any) => {
-                setProfileData(res_data.rows[0]);
-            })
+        if (symbolId) {
+            setRatioData({});
+            getTTMDilutedEPS(symbolId)
+                .then(epsArr => {
+                    if (epsArr.length === 4) {
+                        // Calculate TTM EPS & set state
+                        let totalEps = 0
+                        epsArr.forEach((element: any) => { totalEps += parseFloat(element.value) });
+
+                        setRatioData({
+                            symbolId: symbolId,
+                            quarter_end: epsArr.map((row: any) => row.quarter_ending_on.slice(0,10)),
+                            quarter_diluted_eps: epsArr.map((row: any) => row.value),
+                            ttm_diluted_eps: totalEps
+                        })
+                    }
+                })
         }
-        
     }, [symbolId]);
-  
-    if (symbolId != undefined) {
-        return (<table>{
-            profileData ? Object.entries(profileData).map(([key, value]) => (<tr key={key}><td>{key}</td><td>{String(value)}</td></tr>)) : null
-        }</table>);
+
+    if (Object.keys(ratioData).length !== 0) { // Only render when we have some data point
+        return (
+            <table>
+                <tr>
+                    <td>TTM Diluted EPS</td>
+                    {ratioData.quarter_end.map((date: any) => <td>{date}</td>)}
+                </tr>
+                <tr>
+                    <td>{ratioData.ttm_diluted_eps}</td>
+                    {ratioData.quarter_diluted_eps.map((eps: any) => <td>{eps}</td>)} 
+                </tr>
+            </table>
+        )
     }
 }
 
 export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     const [chartData, setChartData] = useState<ChartData[]>([]);
     const chartOptions = {
-        x: {
-            type: "time",
-            time: {
-                unit: "day"
+        scales: {
+            x: {
+                type: "time",
+                time: {
+                    unit: "day",
+                    displayFormats: {
+                        day: "MMM dd, yyyy"
+                    }
+                },
+                ticks: {
+                    stepSize: 10
+                }
             },
-            title: {
-                display: true,
-                text: "Date"
-            }
-        },
-        y: {
-            title: {
-                display: true,
-                text: "Adjusted Close"
+            y: {
+                title: {
+                    display: true,
+                    text: "Adjusted Close"
+                }
             }
         }
-    };
+    }
 
     const updateChartsData = async (symbolIdArray: number[]): Promise<void> => { // Pull charts data down from server and update state
+        setChartData([]) // Wipe existing data first
         symbolIdArray.forEach((symbolId) => {
             fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_charts/${symbolId}`, {
                 method: "GET",
@@ -69,6 +101,7 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
                     console.log("Error fetching or processing data:", error);
                 });
         })
+        console.log(chartData);
     }
 
     const searchParent = async function(symbolId: number) { // Given symbol ID, see if there is a parent
@@ -90,7 +123,7 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
         }
 
         let outputChartData = {
-            labels: data[0].data.map(row => row.close_date.slice(0, 10)),
+            labels: data[0].data.map(row => parse(row.close_date.slice(0, 10), "yyyy-MM-dd", new Date())),
             datasets: data.map(entry => {
                 return {
                     label: entry.symbol,
@@ -115,6 +148,6 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     }, [symbolId]);
     
     if (symbolId != undefined && chartData.length != 0) {
-        return <Chart type="line" data={formatChartsData(chartData)} />;
+        return <Chart type="line" data={formatChartsData(chartData)} options={chartOptions} />;
     }
 }
