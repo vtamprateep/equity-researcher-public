@@ -83,6 +83,23 @@ const getParentId = function(req, res) {
         });
 }
 
+const getChildId = function(req, res) {
+    const pathParams = req.params;
+
+    pgPool.query(`
+        SELECT
+            symbol_id,
+            type
+        FROM hierarchy
+        WHERE parent_symbol_id = ${pathParams.parent_symbol_id}
+    `)
+        .then((result) => res.send(result))
+        .catch((error) => {
+            console.error("Error executing query:", error);
+            res.status(500).send("Internal Server Error.");
+        });
+}
+
 /**
  * Return financial line items from database `financials` table
  * Path Params: symbol_id
@@ -117,5 +134,6 @@ module.exports = {
     getCharts,
     getSymbolId,
     getParentId,
-    getTTMDilutedEPS
+    getTTMDilutedEPS,
+    getChildId,
 }
