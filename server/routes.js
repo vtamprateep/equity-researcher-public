@@ -1,8 +1,6 @@
 const { Pool } = require('pg');
 const config = require('./config.json');
 
-const STOCK_ID_RESTRICTION = 
-
 // Create client and connect
 const pgPool = new Pool({
     host: config.host,
