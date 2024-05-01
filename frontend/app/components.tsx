@@ -152,6 +152,14 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     }
 }
 
+export function DrillDownDisplayCard({symbolName}: {symbolName: string}) {
+    return (
+        <div className="bg-grey rounded-lg shadow-md p-4 text-center">
+            <h2 className="text-xl font-medium mb-2">{symbolName}</h2>
+        </div>
+    )
+}
+
 /**
  * Displays children symbol ID in cards that user can drill down into
  */
@@ -207,12 +215,10 @@ export function DrillDownDisplay({symbolId}: {symbolId: number | undefined}) {
 
     if (symbolId != undefined && displayData.length > 0) {
         return(
-        <div>
-            <table>
-                {displayData.map((entry: string) => <tr><td>{entry}</td></tr>)}
-            </table>
-        </div>
+            <div className="grid grid-cols-3 gap-4 w-11/12">
+                {displayData.map((entry: string) => <DrillDownDisplayCard symbolName={entry} />)}
+            </div>
         );
     }
-
 }
+

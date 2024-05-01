@@ -1,2 +1,5 @@
 Long-term TODOs:
 - Adjust hierarchy table to list entire lineage of parent symbol IDs in an array to prevent iterative calls to get full lineage
+
+Actual TODOs:
+- Create card component to nicely display child tickers, visualize past day percentage change
