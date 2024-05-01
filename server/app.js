@@ -16,5 +16,6 @@ app.get("/get_symbolid/:symbol", routes.getSymbolId);
 app.get("/get_parent_id/:symbol_id", routes.getParentId);
 app.get("/get_ttm_diluted_eps/:symbol_id", routes.getTTMDilutedEPS);
 app.get("/get_child_id/:parent_symbol_id", routes.getChildId);
+app.get("/get_symbol_names", routes.getSymbolNames);
 
 module.exports = app;

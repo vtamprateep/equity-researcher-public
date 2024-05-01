@@ -58,6 +58,8 @@ export function RatioTable({symbolId}: {symbolId: number | undefined}) {
 
 export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     const [chartData, setChartData] = useState<ChartData[]>([]);
+    const [childSymbolIdArr, setChildSymbolIdArr] = useState<number[]>([]);
+
     const chartOptions = {
         scales: {
             x: {
@@ -94,14 +96,12 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
                         symbol: res_data.rows[0].symbol,
                         data: res_data.rows.map((entry: RouteGetChartsEntry) => { return {close_date: entry.close_date, adj_close: entry.adj_close} })
                     }
-                    console.log(newDataEntry);
                     setChartData(prevChartData => [...prevChartData, newDataEntry]);
                 })
                 .catch(error => {
                     console.log("Error fetching or processing data:", error);
                 });
         })
-        console.log(chartData);
     }
 
     const searchParent = async function(symbolId: number) { // Given symbol ID, see if there is a parent
@@ -150,4 +150,69 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     if (symbolId != undefined && chartData.length != 0) {
         return <Chart type="line" data={formatChartsData(chartData)} options={chartOptions} />;
     }
+}
+
+/**
+ * Displays children symbol ID in cards that user can drill down into
+ */
+export function DrillDownDisplay({symbolId}: {symbolId: number | undefined}) {
+    const [childSymbolIdArr, setChildSymbolIdArr] = useState<number[]>([]);
+    const [displayData, setDisplayData] = useState<any[]>([]);
+
+    /**
+     * Given symbol ID, return array of symbol IDs subordinate in hierarchy table
+     * @param symbolId 
+     */
+    const searchChildId = async function(symbolId: number): Promise<number[]> {
+        return fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_child_id/${symbolId}`, {
+            method: "GET",
+            headers: { 'Content-Type': 'application/json' }
+        })
+            .then(res => res.json())
+            .then((res_data: any) => {
+                if (res_data.rows.length != 0) {
+                    return res_data.rows.map((entry: any) => entry.symbol_id);
+                } else { return [] }
+            });
+    }
+
+    const getStockName = async function(symbolIdArr: number[]): Promise<string[]> {
+        return fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_names?symbol_ids=${symbolIdArr.join(",")}`, {
+            method: "GET",
+            headers: { 'Content-Type': 'application/json' }
+        })
+            .then(res => res.json())
+            .then((res_data: any) => {
+                if (res_data.rows.length != 0) {
+                    return res_data.rows.map((entry: any) => entry.symbol);
+                } else { return [] }
+            })
+    }
+
+    useEffect(() => {
+        if (symbolId != undefined) {
+            searchChildId(symbolId)
+                .then(res => {
+                    setChildSymbolIdArr(res);
+                    getStockName(res)
+                        .then(res => {
+                            setDisplayData(res)
+                        })
+                });
+
+            
+        }
+    }, [symbolId])
+
+
+    if (symbolId != undefined && displayData.length > 0) {
+        return(
+        <div>
+            <table>
+                {displayData.map((entry: string) => <tr><td>{entry}</td></tr>)}
+            </table>
+        </div>
+        );
+    }
+
 }

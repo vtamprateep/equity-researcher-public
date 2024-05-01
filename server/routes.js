@@ -64,7 +64,7 @@ const getSymbolId = function(req, res) {
         .catch((error) => {
             console.error("Error executing query:", error);
             res.status(500).send("Internal Server Error.");
-        });;
+        });
 }
 
 const getParentId = function(req, res) {
@@ -83,6 +83,11 @@ const getParentId = function(req, res) {
         });
 }
 
+/**
+ * Return children symbol IDs based on hierarchy table.
+ * @param {*} req 
+ * @param {*} res 
+ */
 const getChildId = function(req, res) {
     const pathParams = req.params;
 
@@ -130,10 +135,33 @@ const getTTMDilutedEPS = function(req, res) {
         });
 }
 
+/**
+ * Takes in query param `symbol_ids`, comma separated, return symbol ID and respective symbol names
+ * @param {*} req 
+ * @param {*} res 
+ */
+const getSymbolNames = function(req, res) {
+    const queryParams = req.query;
+
+    pgPool.query(`
+        SELECT
+            id,
+            symbol
+        FROM symbol
+        WHERE id IN (${queryParams.symbol_ids})
+    `)
+        .then((result) => res.send(result))
+        .catch((error) => {
+            console.error("Error executing query:", error);
+            res.status(500).send("Internal Server Error.");
+        });
+}
+
 module.exports = {
     getCharts,
     getSymbolId,
     getParentId,
     getTTMDilutedEPS,
     getChildId,
+    getSymbolNames
 }

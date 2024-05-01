@@ -1,9 +1,2 @@
-Meaningful TODO:
-- Create Node server to query database and return stock series
-
-Housekeeping TODO:
-- Data formatting scripts need to reorder the columns to line up with database table structures
-
-Things I did:
-- Created Python scripts to pull Charts / Company / Financial Statements from FMP and make it clean for database
-- Created SQL script to create tables and seed data in database
+Long-term TODOs:
+- Adjust hierarchy table to list entire lineage of parent symbol IDs in an array to prevent iterative calls to get full lineage

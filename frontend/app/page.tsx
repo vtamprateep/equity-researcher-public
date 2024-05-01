@@ -1,6 +1,6 @@
 'use client'
 
-import { RatioTable, PriceChart } from './components';
+import { RatioTable, PriceChart, DrillDownDisplay } from './components';
 import { useEffect, useState } from 'react';
 import config from "../next.config.mjs";
 
@@ -43,8 +43,9 @@ export default function Home() {
                 />
             </div>
             <div className="flex flex-col items-center h-screen">
-                <PriceChart symbolId={focusSymbolId}/>
-                <RatioTable symbolId={focusSymbolId}/>
+                <PriceChart symbolId={focusSymbolId} />
+                <RatioTable symbolId={focusSymbolId} />
+                <DrillDownDisplay symbolId={focusSymbolId} />
             </div>
         </div>
     );
