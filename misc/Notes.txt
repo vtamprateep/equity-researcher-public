@@ -3,3 +3,4 @@ Long-term TODOs:
 
 Actual TODOs:
 - Create card component to nicely display child tickers, visualize past day percentage change
+- Get sample Cohere data on following Symbols: SPY, XLC, XLY, XLP, XLE, XLF, XLV, XLI, XLB, XLRE, XLK, XLU, META, AMZN, PG, XOM, JPM, LLY, GE, LIN, PLD, MSFT, NEE
