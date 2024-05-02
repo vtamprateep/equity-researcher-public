@@ -156,11 +156,37 @@ const getSymbolNames = function(req, res) {
         });
 }
 
+/**
+ * Given a symbol ID, retrieve recent events highlights and citations
+ * @param {*} req 
+ * @param {*} res 
+ */
+const getSymbolHighlights = function(req, res) {
+    const pathParams = req.params;
+
+    pgPool.query(`
+        SELECT
+            highlights,
+            documents,
+            created_on::DATE
+        FROM symbol_highlights
+        WHERE symbol_id = ${pathParams.symbol_id}
+        ORDER BY 3 DESC
+        LIMIT 1;
+    `)
+        .then(result => {res.send(result)})
+        .catch(error => {
+            console.error("Error executing query:", error);
+            res.status(500).send("Internal Server Error.");
+        });
+}
+
 module.exports = {
     getCharts,
     getSymbolId,
     getParentId,
     getTTMDilutedEPS,
     getChildId,
-    getSymbolNames
+    getSymbolNames,
+    getSymbolHighlights
 }

@@ -42,6 +42,15 @@ CREATE TABLE financials (
     quarter_ending_on DATE
 );
 
+/* Create symbol_highlights table */
+CREATE TABLE symbol_highlights (
+    id SERIAL PRIMARY KEY,
+    symbol VARCHAR(20) REFERENCES symbol(symbol),
+    highlights TEXT,
+    documents TEXT[],
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 /* Load data into symbol */
 COPY symbol FROM '/Users/vtamprateep/Documents/GitHub/value-investing-research-platform/data_scripts/symbol.csv' DELIMITER ',' CSV HEADER;
 
