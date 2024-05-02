@@ -58,11 +58,12 @@ export function RatioTable({symbolId}: {symbolId: number | undefined}) {
 
 export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     const [chartData, setChartData] = useState<ChartData[]>([]);
-    const [symbolLineage, setSymbolLineage] = useState<any>();
-
     const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
         scales: {
             x: {
+                grid: { color: "white" },
                 type: "time",
                 time: {
                     unit: "day",
@@ -71,14 +72,27 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
                     }
                 },
                 ticks: {
-                    stepSize: 10
+                    stepSize: 30,
+                    color: "white"
                 }
             },
             y: {
                 title: {
                     display: true,
-                    text: "Adjusted Close"
+                    text: "Adjusted Close ($)",
+                    color: "white",
+                    font: {
+                        size: 16
+                    }
+                },
+                ticks: {
+                    color: "white",
                 }
+            }
+        },
+        plugins: {
+            legend: {
+                labels: { color: "white" }
             }
         }
     }
@@ -115,9 +129,9 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
             datasets: data.map((entry: any) => {
                 // Set series color
                 let lineColor;
-                if (entry.type == "MARKET") {lineColor = "red"};
-                if (entry.type == "SECTOR") {lineColor = "green"};
-                if (entry.type == "INDIVIDUAL") {lineColor = "blue"};
+                if (entry.type == "MARKET") {lineColor = "rgba(211,84,0,1"};
+                if (entry.type == "SECTOR") {lineColor = "rgba(242,121,53,1)"};
+                if (entry.type == "INDIVIDUAL") {lineColor = "rgba(249,191,59,1)"};
 
                 return {
                     label: entry.symbol,
@@ -142,14 +156,21 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
                 .then((res_data: any) => {
                     if (res_data.rows.length != 0) {
                         updateChartsData(res_data.rows);
-                        setSymbolLineage(res_data.rows);
                     }
                 })
         }
     }, [symbolId]);
     
     if (symbolId != undefined && chartData.length != 0) {
-        return <Chart type="line" data={formatChartsData(chartData)} options={chartOptions} />;
+        return (
+            <div className="container mx-4 my-4">
+                <Chart 
+                    type="line"
+                    data={formatChartsData(chartData)} 
+                    options={chartOptions}
+                    className="w-full h-full" />
+            </div>
+        );
     }
 }
 
@@ -240,29 +261,32 @@ export function SummaryHighlights({symbolId}: {symbolId: number | undefined}) {
 
     if (summaryText != undefined) {
         return (
-            <div className="p-4 border border-gray-300 rounded-lg">
+            <div className="p-4 border border-gray-300 rounded-lg text-white container">
                 <div className="mb-4">
                     <h2 className="text-lg font-semibold mb-2">News Summary</h2>
-                    <p>{summaryText}</p>
+                    <p style={{whiteSpace: "pre-line"}}>{summaryText}</p>
                 </div>
-            {showCitations && (
-                <div>
-                    <h3 className="text-lg font-semibold mb-2">Citations</h3>
-                    <ul>
-                        {summaryCitations.map((citation, index) => (
-                            <li key={index} className="mb-1">
-                                <a href={citation} target="_blank" rel="noopener noreferrer">{citation}</a>
-                            </li>
-                        ))}
-                    </ul>
+                {showCitations && (
+                    <div>
+                        <h3 className="text-lg font-semibold mb-2">Citations</h3>
+                        <ul>
+                            {summaryCitations.map((citation, index) => (
+                                <li key={index} className="mb-1">
+                                    <a href={citation} target="_blank" rel="noopener noreferrer">{citation}</a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+                <div className="flex justify-center">
+                    <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
+                        onClick={() => setShowCitations(!showCitations)}
+                    >
+                        {showCitations ? "Hide Citations" : "See Citations"}
+                    </button>
                 </div>
-            )}
-                <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
-                    onClick={() => setShowCitations(!showCitations)}
-                >
-                    {showCitations ? "Hide Citations" : "See Citations"}
-                </button>
+                
             </div>
         )
     }

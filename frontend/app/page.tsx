@@ -31,19 +31,19 @@ export default function Home() {
 
     return (
         <div>
-            <div className="bg-blue-500 py-4 px-8 text-white flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Cool Banner</h1>
+            <div className="bg-slate-700 py-4 px-8 text-white flex items-center justify-between">
+                <h1 className="text-2xl font-bold">Equity Researcher</h1>
                 <input
                     type="text"
                     id="searchInputField"
                     value={input}
                     onChange={updateInput}
                     onKeyDown={submitInputHandler}
-                    placeholder="Search..."
+                    placeholder="Enter ticker symbol here..."
                     className="px-4 py-2 rounded-md text-black"
                 />
             </div>
-            <div className="flex flex-col items-center h-screen">
+            <div className="flex flex-col items-center h-screen mx-8 my-8">
                 <PriceChart symbolId={focusSymbolId} />
                 <SummaryHighlights symbolId={focusSymbolId} />
                 <RatioTable symbolId={focusSymbolId} />
