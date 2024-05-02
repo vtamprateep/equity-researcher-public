@@ -38,7 +38,7 @@ export function RatioTable({symbolId}: {symbolId: number | undefined}) {
                     }
                 })
         }
-    }, [symbolId]);
+    }, []);
 
     if (Object.keys(ratioData).length !== 0) { // Only render when we have some data point
         return (
@@ -236,7 +236,7 @@ export function SummaryHighlights({symbolId}: {symbolId: number | undefined}) {
                 }
                 
             })
-    })
+    }, [symbolId])
 
     if (summaryText != undefined) {
         return (
