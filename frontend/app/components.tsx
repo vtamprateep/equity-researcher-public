@@ -58,7 +58,7 @@ export function RatioTable({symbolId}: {symbolId: number | undefined}) {
 
 export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     const [chartData, setChartData] = useState<ChartData[]>([]);
-    const [childSymbolIdArr, setChildSymbolIdArr] = useState<number[]>([]);
+    const [symbolLineage, setSymbolLineage] = useState<any>();
 
     const chartOptions = {
         scales: {
@@ -83,17 +83,18 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
         }
     }
 
-    const updateChartsData = async (symbolIdArray: number[]): Promise<void> => { // Pull charts data down from server and update state
+    const updateChartsData = async (symbolData: any): Promise<void> => { // Pull charts data down from server and update state
         setChartData([]) // Wipe existing data first
-        symbolIdArray.forEach((symbolId) => {
-            fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_charts/${symbolId}`, {
+        symbolData.forEach((entry: any) => {
+            fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_charts/${entry.symbol_id}`, {
                 method: "GET",
                 headers: { 'Content-Type': 'application/json' },
             })
                 .then((res) => res.json())
                 .then((res_data: any) => {
                     let newDataEntry = {
-                        symbol: res_data.rows[0].symbol,
+                        symbol: entry.symbol,
+                        type: entry.type,
                         data: res_data.rows.map((entry: RouteGetChartsEntry) => { return {close_date: entry.close_date, adj_close: entry.adj_close} })
                     }
                     setChartData(prevChartData => [...prevChartData, newDataEntry]);
@@ -101,7 +102,7 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
                 .catch(error => {
                     console.log("Error fetching or processing data:", error);
                 });
-        })
+        });
     }
 
     const formatChartsData = (data: ChartData[]) => { // Format data to be put into Chart.js component
@@ -111,11 +112,17 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
 
         let outputChartData = {
             labels: data[0].data.map(row => parse(row.close_date.slice(0, 10), "yyyy-MM-dd", new Date())),
-            datasets: data.map(entry => {
+            datasets: data.map((entry: any) => {
+                // Set series color
+                let lineColor;
+                if (entry.type == "MARKET") {lineColor = "red"};
+                if (entry.type == "SECTOR") {lineColor = "green"};
+                if (entry.type == "INDIVIDUAL") {lineColor = "blue"};
+
                 return {
                     label: entry.symbol,
                     data: entry.data.map((row: any) => row.adj_close),
-                    borderColor: "red",
+                    borderColor: lineColor,
                     fill: false
                 }
             })
@@ -133,9 +140,9 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
             })
                 .then((res) => res.json())
                 .then((res_data: any) => {
-                    console.log(res_data);
                     if (res_data.rows.length != 0) {
-                        updateChartsData([...res_data.rows[0].parent_symbol_ids, symbolId]);
+                        updateChartsData(res_data.rows);
+                        setSymbolLineage(res_data.rows);
                     }
                 })
         }

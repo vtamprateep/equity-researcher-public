@@ -70,10 +70,20 @@ const getParentIds = function(req, res) {
     const pathParams = req.params;
 
     pgPool.query(`
+        WITH cte_parent_symbol_id AS (
+            SELECT
+                parent_symbol_ids
+            FROM hierarchy
+            WHERE symbol_id = ${pathParams.symbol_id}
+        )
         SELECT
-            parent_symbol_ids
+            symbol_id,
+            symbol,
+            "type"
         FROM hierarchy
-        WHERE symbol_id = ${pathParams.symbol_id}
+            LEFT JOIN symbol ON symbol.id = hierarchy.symbol_id
+        WHERE symbol_id = ANY(SELECT UNNEST(parent_symbol_ids) FROM cte_parent_symbol_id)
+            OR symbol_id = ${pathParams.symbol_id}
     `)
         .then((result) => res.send(result))
         .catch((error) => {
@@ -96,6 +106,7 @@ const getChildIds = function(req, res) {
             type
         FROM hierarchy
         WHERE ${pathParams.parent_symbol_id} = ANY(parent_symbol_ids)
+        LIMIT 50
     `)
         .then((result) => res.send(result))
         .catch((error) => {
