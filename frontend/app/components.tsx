@@ -164,7 +164,6 @@ export function DrillDownDisplayCard({symbolName}: {symbolName: string}) {
  * Displays children symbol ID in cards that user can drill down into
  */
 export function DrillDownDisplay({symbolId}: {symbolId: number | undefined}) {
-    const [childSymbolIdArr, setChildSymbolIdArr] = useState<number[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
 
     /**
@@ -201,7 +200,6 @@ export function DrillDownDisplay({symbolId}: {symbolId: number | undefined}) {
         if (symbolId != undefined) {
             searchChildId(symbolId)
                 .then(res => {
-                    setChildSymbolIdArr(res);
                     getStockName(res)
                         .then(res => {
                             setDisplayData(res)
@@ -222,3 +220,52 @@ export function DrillDownDisplay({symbolId}: {symbolId: number | undefined}) {
     }
 }
 
+export function SummaryHighlights({symbolId}: {symbolId: number | undefined}) {
+    const [summaryText, setSummaryText] = useState<string>();
+    const [summaryCitations, setSummaryCitations] = useState<string[]>([]);
+    const [showCitations, setShowCitations] = useState<boolean>(false);
+
+    useEffect(() => {
+        fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_highlights/${symbolId}`, {
+            method: "GET",
+            headers: { 'Content-Type': 'application/json' }
+        })
+            .then(res => res.json())
+            .then(res_data => {
+                if (res_data.rows.length > 0) {
+                    setSummaryText(res_data.rows[0].highlights);
+                    setSummaryCitations(res_data.rows[0].documents);
+                }
+                
+            })
+    })
+
+    if (summaryText != undefined) {
+        return (
+            <div className="p-4 border border-gray-300 rounded-lg">
+                <div className="mb-4">
+                    <h2 className="text-lg font-semibold mb-2">News Summary</h2>
+                    <p>{summaryText}</p>
+                </div>
+            {showCitations && (
+                <div>
+                    <h3 className="text-lg font-semibold mb-2">Citations</h3>
+                    <ul>
+                        {summaryCitations.map((citation, index) => (
+                            <li key={index} className="mb-1">
+                                <a href={citation} target="_blank" rel="noopener noreferrer">{citation}</a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+                <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
+                    onClick={() => setShowCitations(!showCitations)}
+                >
+                    {showCitations ? "Hide Citations" : "See Citations"}
+                </button>
+            </div>
+        )
+    }
+}
