@@ -104,19 +104,6 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
         })
     }
 
-    const searchParent = async function(symbolId: number) { // Given symbol ID, see if there is a parent
-        return fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_parent_id/${symbolId}`, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' }
-        })
-            .then((res) => res.json())
-            .then((res_data: any) => {
-                if (res_data.rows.length != 0) {
-                    return res_data.rows[0].parent_symbol_id;
-                } else { return undefined }
-            })
-    }
-
     const formatChartsData = (data: ChartData[]) => { // Format data to be put into Chart.js component
         if (data.length == 0) { // Base case
             return { labels: [], datasets: [] }
@@ -140,9 +127,16 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     useEffect(() => {
         if (symbolId != undefined) {
             // Search for parent, if exists get series data
-            searchParent(symbolId)
-                .then(parentSymbolId => {
-                    parentSymbolId ? updateChartsData([symbolId, parentSymbolId]) : updateChartsData([symbolId]);
+            fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_parent_ids/${symbolId}`, {
+                method: "GET",
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then((res) => res.json())
+                .then((res_data: any) => {
+                    console.log(res_data);
+                    if (res_data.rows.length != 0) {
+                        updateChartsData([...res_data.rows[0].parent_symbol_ids, symbolId]);
+                    }
                 })
         }
     }, [symbolId]);
@@ -171,7 +165,7 @@ export function DrillDownDisplay({symbolId}: {symbolId: number | undefined}) {
      * @param symbolId 
      */
     const searchChildId = async function(symbolId: number): Promise<number[]> {
-        return fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_child_id/${symbolId}`, {
+        return fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_child_ids/${symbolId}`, {
             method: "GET",
             headers: { 'Content-Type': 'application/json' }
         })
@@ -204,12 +198,9 @@ export function DrillDownDisplay({symbolId}: {symbolId: number | undefined}) {
                         .then(res => {
                             setDisplayData(res)
                         })
-                });
-
-            
+                });   
         }
     }, [symbolId])
-
 
     if (symbolId != undefined && displayData.length > 0) {
         return(

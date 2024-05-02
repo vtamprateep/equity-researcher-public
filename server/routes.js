@@ -66,12 +66,12 @@ const getSymbolId = function(req, res) {
         });
 }
 
-const getParentId = function(req, res) {
+const getParentIds = function(req, res) {
     const pathParams = req.params;
 
     pgPool.query(`
         SELECT
-            parent_symbol_id
+            parent_symbol_ids
         FROM hierarchy
         WHERE symbol_id = ${pathParams.symbol_id}
     `)
@@ -87,7 +87,7 @@ const getParentId = function(req, res) {
  * @param {*} req 
  * @param {*} res 
  */
-const getChildId = function(req, res) {
+const getChildIds = function(req, res) {
     const pathParams = req.params;
 
     pgPool.query(`
@@ -95,7 +95,7 @@ const getChildId = function(req, res) {
             symbol_id,
             type
         FROM hierarchy
-        WHERE parent_symbol_id = ${pathParams.parent_symbol_id}
+        WHERE ${pathParams.parent_symbol_id} = ANY(parent_symbol_ids)
     `)
         .then((result) => res.send(result))
         .catch((error) => {
@@ -184,9 +184,9 @@ const getSymbolHighlights = function(req, res) {
 module.exports = {
     getCharts,
     getSymbolId,
-    getParentId,
+    getParentIds,
     getTTMDilutedEPS,
-    getChildId,
+    getChildIds,
     getSymbolNames,
     getSymbolHighlights
 }

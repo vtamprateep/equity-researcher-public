@@ -23,6 +23,7 @@ export default function Home() {
                         setFocusSymbolId(res_data.rows[0].id);
                     }
                 })
+                .then
         }
     }
 

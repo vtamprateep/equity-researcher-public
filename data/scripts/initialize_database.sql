@@ -30,7 +30,7 @@ DROP TABLE IF EXISTS hierarchy;
 CREATE TABLE hierarchy (
     symbol_id INTEGER REFERENCES symbol(id),
     "type" VARCHAR(20),
-    parent_symbol_id INTEGER REFERENCES symbol(id)
+    parent_symbol_ids INTEGER[]
 );
 
 /* Create financials table if doesn't exist */
@@ -50,9 +50,3 @@ CREATE TABLE symbol_highlights (
     documents TEXT[],
     created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-/* Load data into symbol */
-COPY symbol FROM '/Users/vtamprateep/Documents/GitHub/value-investing-research-platform/data_scripts/symbol.csv' DELIMITER ',' CSV HEADER;
-
-/* Load data into charts */
-COPY charts FROM '/Users/vtamprateep/Documents/GitHub/value-investing-research-platform/data//charts/charts.csv' DELIMITER ',' CSV HEADER;
