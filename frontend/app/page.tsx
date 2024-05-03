@@ -2,7 +2,6 @@
 
 import { RatioTable, PriceChart, DrillDownDisplay, SummaryHighlights } from './components';
 import { useEffect, useState } from 'react';
-import config from "../next.config.mjs";
 import { ServerRoutes } from './util/server';
 
 

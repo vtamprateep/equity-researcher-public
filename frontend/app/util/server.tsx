@@ -9,7 +9,7 @@ export class ServerRoutes {
      * @param startDate 
      * @param endDate 
      */
-    static async getCharts({symbolId, startDate, endDate}: {symbolId: number, startDate?: Date, endDate?: Date}) {
+    static async getCharts(symbolId: number, startDate?: Date, endDate?: Date) {
         // Construct URL
         if (startDate === undefined) {
             let year = new Date().getFullYear() - 1;
@@ -56,9 +56,9 @@ export class ServerRoutes {
      * Return array containing lineage of symbol IDs
      * @param symbolId
      */
-    static async getParentIds({symbolId}: {symbolId: number}) {
+    static async getParentIds(symbolId: number) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_parent_ids/${symbolId}`;
-        fetch(endpoint, {
+        return fetch(endpoint, {
             method: "GET",
             headers: { 'Content-Type': 'application/json' }
         })
@@ -76,7 +76,7 @@ export class ServerRoutes {
      */
     static async getTTMDilutedEPS({symbolId}: {symbolId: number}) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_ttm_diluted_eps/${symbolId}`;
-        fetch(endpoint, {
+        return fetch(endpoint, {
             method: "GET",
             headers: { 'Content-Type': 'application/json' }
         })
@@ -88,9 +88,9 @@ export class ServerRoutes {
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    static async getChildIds({symbolId}: {symbolId: number}) {
+    static async getChildIds(symbolId: number) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_child_ids/${symbolId}`;
-        fetch(endpoint, {
+        return fetch(endpoint, {
             method: "GET",
             headers: { 'Content-Type': 'application/json' }
         })
@@ -102,9 +102,9 @@ export class ServerRoutes {
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    static async getSymbolNames({symbolIdArr}: {symbolIdArr: number[]}) {
+    static async getSymbolNames(symbolIdArr: number[]) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_names?symbol_ids=${symbolIdArr.join(",")}`;
-        fetch(endpoint, {
+        return fetch(endpoint, {
             method: "GET",
             headers: { 'Content-Type': 'application/json' }
         })
@@ -116,9 +116,9 @@ export class ServerRoutes {
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    static async getSymbolHighlights({symbolId}: {symbolId: number}) {
+    static async getSymbolHighlights(symbolId: number) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_highlights/${symbolId}`
-        fetch(endpoint, {
+        return fetch(endpoint, {
             method: "GET",
             headers: { 'Content-Type': 'application/json' }
         })

@@ -5,6 +5,7 @@ import config from "../next.config.mjs";
 
 import { parse } from "date-fns";
 import 'chartjs-adapter-date-fns';
+import { ServerRoutes } from './util/server';
 
 
 export function RatioTable({symbolId}: {symbolId: number | undefined}) {
@@ -100,22 +101,15 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     const updateChartsData = async (symbolData: any): Promise<void> => { // Pull charts data down from server and update state
         setChartData([]) // Wipe existing data first
         symbolData.forEach((entry: any) => {
-            fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_charts/${entry.symbol_id}`, {
-                method: "GET",
-                headers: { 'Content-Type': 'application/json' },
-            })
-                .then((res) => res.json())
-                .then((res_data: any) => {
+            ServerRoutes.getCharts(entry.symbol_id)
+                .then(data => {
                     let newDataEntry = {
                         symbol: entry.symbol,
                         type: entry.type,
-                        data: res_data.rows.map((entry: RouteGetChartsEntry) => { return {close_date: entry.close_date, adj_close: entry.adj_close} })
+                        data: data.rows.map((entry: RouteGetChartsEntry) => { return {close_date: entry.close_date, adj_close: entry.adj_close} })
                     }
                     setChartData(prevChartData => [...prevChartData, newDataEntry]);
                 })
-                .catch(error => {
-                    console.log("Error fetching or processing data:", error);
-                });
         });
     }
 
@@ -148,15 +142,9 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     useEffect(() => {
         if (symbolId != undefined) {
             // Search for parent, if exists get series data
-            fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_parent_ids/${symbolId}`, {
-                method: "GET",
-                headers: { 'Content-Type': 'application/json' }
-            })
-                .then((res) => res.json())
-                .then((res_data: any) => {
-                    if (res_data.rows.length != 0) {
-                        updateChartsData(res_data.rows);
-                    }
+            ServerRoutes.getParentIds(symbolId)
+                .then((data: any) => {
+                    data.rows.length ? updateChartsData(data.rows) : undefined
                 })
         }
     }, [symbolId]);
@@ -188,51 +176,30 @@ export function DrillDownDisplayCard({symbolName}: {symbolName: string}) {
 export function DrillDownDisplay({symbolId}: {symbolId: number | undefined}) {
     const [displayData, setDisplayData] = useState<any[]>([]);
 
-    /**
-     * Given symbol ID, return array of symbol IDs subordinate in hierarchy table
-     * @param symbolId 
-     */
-    const searchChildId = async function(symbolId: number): Promise<number[]> {
-        return fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_child_ids/${symbolId}`, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' }
-        })
-            .then(res => res.json())
-            .then((res_data: any) => {
-                if (res_data.rows.length != 0) {
-                    return res_data.rows.map((entry: any) => entry.symbol_id);
-                } else { return [] }
-            });
-    }
-
-    const getStockName = async function(symbolIdArr: number[]): Promise<string[]> {
-        return fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_names?symbol_ids=${symbolIdArr.join(",")}`, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' }
-        })
-            .then(res => res.json())
-            .then((res_data: any) => {
-                if (res_data.rows.length != 0) {
-                    return res_data.rows.map((entry: any) => entry.symbol);
-                } else { return [] }
-            })
-    }
-
     useEffect(() => {
         if (symbolId != undefined) {
-            searchChildId(symbolId)
+            ServerRoutes.getChildIds(symbolId)
+                .then((data: any) => {
+                    if (data.rows.length != 0) {
+                        return data.rows.map((entry: any) => entry.symbol_id);
+                    } else { return [] }
+                })
                 .then(res => {
-                    getStockName(res)
-                        .then(res => {
-                            setDisplayData(res)
+                    ServerRoutes.getSymbolNames(res)
+                        .then((data: any) => {
+                            if (data.rows.length > 0) {
+                                let symbolList = data.rows.map((entry: any) => entry.symbol);
+                                setDisplayData(symbolList);
+                            }
                         })
                 });   
         }
     }, [symbolId])
 
     if (symbolId != undefined && displayData.length > 0) {
+
         return(
-            <div className="grid grid-cols-3 gap-4 w-11/12">
+            <div className="grid grid-cols-3 gap-4 w-11/12 bg-white">
                 {displayData.map((entry: string) => <DrillDownDisplayCard symbolName={entry} />)}
             </div>
         );
@@ -245,18 +212,15 @@ export function SummaryHighlights({symbolId}: {symbolId: number | undefined}) {
     const [showCitations, setShowCitations] = useState<boolean>(false);
 
     useEffect(() => {
-        fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_highlights/${symbolId}`, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' }
-        })
-            .then(res => res.json())
-            .then(res_data => {
-                if (res_data.rows.length > 0) {
-                    setSummaryText(res_data.rows[0].highlights);
-                    setSummaryCitations(res_data.rows[0].documents);
+        if (symbolId !== undefined) {
+            ServerRoutes.getSymbolHighlights(symbolId)
+            .then(data => {
+                if (data.rows.length > 0) {
+                    setSummaryText(data.rows[0].highlights);
+                    setSummaryCitations(data.rows[0].documents);
                 }
-                
             })
+        }
     }, [symbolId])
 
     if (summaryText != undefined) {
