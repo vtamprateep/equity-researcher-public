@@ -3,6 +3,7 @@
 import { RatioTable, PriceChart, DrillDownDisplay, SummaryHighlights } from './components';
 import { useEffect, useState } from 'react';
 import config from "../next.config.mjs";
+import { ServerRoutes } from './util/server';
 
 
 export default function Home() {
@@ -16,14 +17,9 @@ export default function Home() {
 
     const submitInputHandler = (e: any) => {
         if (e.key == "Enter" && input != undefined) {
-            fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbolid/${input.toUpperCase()}`)
-                .then(res => res.json())
-                .then((res_data: any) => {
-                    if (res_data.rows.length != 0) {
-                        setFocusSymbolId(res_data.rows[0].id);
-                    }
-                })
-                .then
+            ServerRoutes.getSymbolId(input.toUpperCase())
+                .then(data => data.rows.length ? setFocusSymbolId(data.rows[0].id) : undefined)
+                .catch(error => { console.log(error) });
         }
     }
 

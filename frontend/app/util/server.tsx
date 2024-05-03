@@ -1,7 +1,7 @@
 import config from "../../next.config.mjs";
 
 
-class ServerRoutes {
+export class ServerRoutes {
 
     /**
      * Returns chart prices given a symbol ID and start / end dates
@@ -9,7 +9,7 @@ class ServerRoutes {
      * @param startDate 
      * @param endDate 
      */
-    async getCharts({symbolId, startDate, endDate}: {symbolId: number, startDate?: Date, endDate?: Date}) {
+    static async getCharts({symbolId, startDate, endDate}: {symbolId: number, startDate?: Date, endDate?: Date}) {
         // Construct URL
         if (startDate === undefined) {
             let year = new Date().getFullYear() - 1;
@@ -37,7 +37,7 @@ class ServerRoutes {
      * Return symbol ID given a symbol string
      * @param symbol
      */
-    async getSymbolId({symbol}: {symbol: string}) {
+    static async getSymbolId(symbol: string) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbolid/${symbol.toUpperCase()}`
 
         return fetch(endpoint, {
@@ -56,7 +56,7 @@ class ServerRoutes {
      * Return array containing lineage of symbol IDs
      * @param symbolId
      */
-    async getParentIds({symbolId}: {symbolId: number}) {
+    static async getParentIds({symbolId}: {symbolId: number}) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_parent_ids/${symbolId}`;
         fetch(endpoint, {
             method: "GET",
@@ -74,7 +74,7 @@ class ServerRoutes {
      * Return past 4 quarters of diluted EPS
      * @param symbolId
      */
-    async getTTMDilutedEPS({symbolId}: {symbolId: number}) {
+    static async getTTMDilutedEPS({symbolId}: {symbolId: number}) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_ttm_diluted_eps/${symbolId}`;
         fetch(endpoint, {
             method: "GET",
@@ -88,7 +88,7 @@ class ServerRoutes {
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    async getChildIds({symbolId}: {symbolId: number}) {
+    static async getChildIds({symbolId}: {symbolId: number}) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_child_ids/${symbolId}`;
         fetch(endpoint, {
             method: "GET",
@@ -102,7 +102,7 @@ class ServerRoutes {
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    async getSymbolNames({symbolIdArr}: {symbolIdArr: number[]}) {
+    static async getSymbolNames({symbolIdArr}: {symbolIdArr: number[]}) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_names?symbol_ids=${symbolIdArr.join(",")}`;
         fetch(endpoint, {
             method: "GET",
@@ -116,7 +116,7 @@ class ServerRoutes {
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    async getSymbolHighlights({symbolId}: {symbolId: number}) {
+    static async getSymbolHighlights({symbolId}: {symbolId: number}) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_highlights/${symbolId}`
         fetch(endpoint, {
             method: "GET",
