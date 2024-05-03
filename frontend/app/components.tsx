@@ -8,37 +8,26 @@ import 'chartjs-adapter-date-fns';
 import { ServerRoutes } from './util/server';
 
 
-export function RatioTable({symbolId}: {symbolId: number | undefined}) {
+export function RatioTable({symbolId}: {symbolId: number}) {
     const [ratioData, setRatioData] = useState<any>({});
 
-    const getTTMDilutedEPS = async function(symbolId: number) {
-        return fetch(`http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_ttm_diluted_eps/${symbolId}`, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' },
-        })
-            .then(res => res.json())
-            .then(res_data => res_data.rows);
-    }
-
     useEffect(() => {
-        if (symbolId) {
-            setRatioData({});
-            getTTMDilutedEPS(symbolId)
-                .then(epsArr => {
-                    if (epsArr.length === 4) {
-                        // Calculate TTM EPS & set state
-                        let totalEps = 0
-                        epsArr.forEach((element: any) => { totalEps += parseFloat(element.value) });
+        setRatioData({});
+        ServerRoutes.getTTMDilutedEPS(symbolId)
+            .then(epsArr => {
+                if (epsArr.length === 4) {
+                    // Calculate TTM EPS & set state
+                    let totalEps = 0
+                    epsArr.forEach((element: any) => { totalEps += parseFloat(element.value) });
 
-                        setRatioData({
-                            symbolId: symbolId,
-                            quarter_end: epsArr.map((row: any) => row.quarter_ending_on.slice(0,10)),
-                            quarter_diluted_eps: epsArr.map((row: any) => row.value),
-                            ttm_diluted_eps: totalEps
-                        })
-                    }
-                })
-        }
+                    setRatioData({
+                        symbolId: symbolId,
+                        quarter_end: epsArr.map((row: any) => row.quarter_ending_on.slice(0,10)),
+                        quarter_diluted_eps: epsArr.map((row: any) => row.value),
+                        ttm_diluted_eps: totalEps
+                    })
+                }
+            })
     }, []);
 
     if (Object.keys(ratioData).length !== 0) { // Only render when we have some data point
@@ -57,7 +46,7 @@ export function RatioTable({symbolId}: {symbolId: number | undefined}) {
     }
 }
 
-export function PriceChart({symbolId}: {symbolId: number | undefined}) {
+export function PriceChart({symbolId}: {symbolId: number}) {
     const [chartData, setChartData] = useState<ChartData[]>([]);
     const chartOptions = {
         responsive: true,
@@ -98,19 +87,18 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
         }
     }
 
-    const updateChartsData = async (symbolData: any): Promise<void> => { // Pull charts data down from server and update state
-        setChartData([]) // Wipe existing data first
-        symbolData.forEach((entry: any) => {
-            ServerRoutes.getCharts(entry.symbol_id)
+    const updateChartsData = async (symbolData: any): Promise<void> => {
+        const dataEntries = await Promise.all(symbolData.map(async (entry:any) => {
+            return ServerRoutes.getCharts(entry.symbol_id)
                 .then(data => {
-                    let newDataEntry = {
+                    return {
                         symbol: entry.symbol,
                         type: entry.type,
-                        data: data.rows.map((entry: RouteGetChartsEntry) => { return {close_date: entry.close_date, adj_close: entry.adj_close} })
+                        data: data.rows.map((entry: any) => ({close_date: entry.close_date, adj_close: entry.adj_close}))
                     }
-                    setChartData(prevChartData => [...prevChartData, newDataEntry]);
                 })
-        });
+        }));
+        setChartData(dataEntries);
     }
 
     const formatChartsData = (data: ChartData[]) => { // Format data to be put into Chart.js component
@@ -140,26 +128,22 @@ export function PriceChart({symbolId}: {symbolId: number | undefined}) {
     }
     
     useEffect(() => {
-        if (symbolId != undefined) {
-            // Search for parent, if exists get series data
-            ServerRoutes.getParentIds(symbolId)
-                .then((data: any) => {
-                    data.rows.length ? updateChartsData(data.rows) : undefined
-                })
-        }
+        // Search for parent, if exists get series data
+        ServerRoutes.getParentIds(symbolId)
+            .then((data: any) => {
+                data.rows.length ? updateChartsData(data.rows) : undefined
+            })
     }, [symbolId]);
     
-    if (symbolId != undefined && chartData.length != 0) {
-        return (
-            <div className="container mx-4 my-4">
-                <Chart 
-                    type="line"
-                    data={formatChartsData(chartData)} 
-                    options={chartOptions}
-                    className="w-full h-full" />
-            </div>
-        );
-    }
+    return (
+        <div className="container mx-4 my-4">
+            <Chart 
+                type="line"
+                data={formatChartsData(chartData)} 
+                options={chartOptions}
+                className="w-full h-full" />
+        </div>
+    );
 }
 
 export function DrillDownDisplayCard({symbolName}: {symbolName: string}) {
@@ -173,85 +157,74 @@ export function DrillDownDisplayCard({symbolName}: {symbolName: string}) {
 /**
  * Displays children symbol ID in cards that user can drill down into
  */
-export function DrillDownDisplay({symbolId}: {symbolId: number | undefined}) {
+export function DrillDownDisplay({symbolId}: {symbolId: number}) {
     const [displayData, setDisplayData] = useState<any[]>([]);
 
     useEffect(() => {
-        if (symbolId != undefined) {
-            ServerRoutes.getChildIds(symbolId)
-                .then((data: any) => {
-                    if (data.rows.length != 0) {
-                        return data.rows.map((entry: any) => entry.symbol_id);
-                    } else { return [] }
-                })
-                .then(res => {
-                    ServerRoutes.getSymbolNames(res)
-                        .then((data: any) => {
-                            if (data.rows.length > 0) {
-                                let symbolList = data.rows.map((entry: any) => entry.symbol);
-                                setDisplayData(symbolList);
-                            }
-                        })
-                });   
-        }
+        ServerRoutes.getChildIds(symbolId)
+            .then((data: any) => {
+                if (data.rows.length != 0) {
+                    return data.rows.map((entry: any) => entry.symbol_id);
+                }
+            })
+            .then(res => {
+                if (!res) { return } // Terminate if no child IDs to search
+                ServerRoutes.getSymbolNames(res)
+                    .then((data: any) => {
+                        setDisplayData(data.rows.map((entry: any) => entry.symbol));
+                    })
+            });   
     }, [symbolId])
 
-    if (symbolId != undefined && displayData.length > 0) {
-
-        return(
-            <div className="grid grid-cols-3 gap-4 w-11/12 bg-white">
-                {displayData.map((entry: string) => <DrillDownDisplayCard symbolName={entry} />)}
-            </div>
-        );
-    }
+    return(
+        <div className="grid grid-cols-3 gap-4 w-11/12 bg-white">
+            {displayData.map((entry: string) => <DrillDownDisplayCard symbolName={entry} />)}
+        </div>
+    );
 }
 
-export function SummaryHighlights({symbolId}: {symbolId: number | undefined}) {
+export function SummaryHighlights({symbolId}: {symbolId: number}) {
     const [summaryText, setSummaryText] = useState<string>();
     const [summaryCitations, setSummaryCitations] = useState<string[]>([]);
     const [showCitations, setShowCitations] = useState<boolean>(false);
 
     useEffect(() => {
-        if (symbolId !== undefined) {
-            ServerRoutes.getSymbolHighlights(symbolId)
+        ServerRoutes.getSymbolHighlights(symbolId)
             .then(data => {
                 if (data.rows.length > 0) {
                     setSummaryText(data.rows[0].highlights);
                     setSummaryCitations(data.rows[0].documents);
                 }
             })
-        }
     }, [symbolId])
 
-    if (summaryText != undefined) {
-        return (
-            <div className="p-4 border border-gray-300 rounded-lg text-white container">
-                <div className="mb-4">
-                    <h2 className="text-lg font-semibold mb-2">News Summary</h2>
-                    <p style={{whiteSpace: "pre-line"}}>{summaryText}</p>
-                </div>
-                {showCitations && (
-                    <div>
-                        <h3 className="text-lg font-semibold mb-2">Citations</h3>
-                        <ul>
-                            {summaryCitations.map((citation, index) => (
-                                <li key={index} className="mb-1">
-                                    <a href={citation} target="_blank" rel="noopener noreferrer">{citation}</a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-                <div className="flex justify-center">
-                    <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
-                        onClick={() => setShowCitations(!showCitations)}
-                    >
-                        {showCitations ? "Hide Citations" : "See Citations"}
-                    </button>
-                </div>
-                
+    return (
+        <div className="p-4 border border-gray-300 rounded-lg text-white container">
+            <div className="mb-4">
+                <h2 className="text-lg font-semibold mb-2">News Summary</h2>
+                <p style={{whiteSpace: "pre-line"}}>{summaryText}</p>
             </div>
-        )
-    }
+            {showCitations && (
+                <div>
+                    <h3 className="text-lg font-semibold mb-2">Citations</h3>
+                    <ul>
+                        {summaryCitations.map((citation, index) => (
+                            <li key={index} className="mb-1">
+                                <a href={citation} target="_blank" rel="noopener noreferrer">{citation}</a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+            <div className="flex justify-center">
+                <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
+                    onClick={() => setShowCitations(!showCitations)}
+                >
+                    {showCitations ? "Hide Citations" : "See Citations"}
+                </button>
+            </div>
+            
+        </div>
+    )
 }

@@ -70,7 +70,7 @@ export class ServerRoutes {
      * Return past 4 quarters of diluted EPS
      * @param symbolId
      */
-    static async getTTMDilutedEPS({symbolId}: {symbolId: number}) {
+    static async getTTMDilutedEPS(symbolId: number) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_ttm_diluted_eps/${symbolId}`;
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {

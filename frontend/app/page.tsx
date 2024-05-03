@@ -22,8 +22,6 @@ export default function Home() {
         }
     }
 
-    useEffect(() => {}, [focusSymbolId]); // Set useEffect to refresh based on value change
-
     return (
         <div>
             <div className="bg-slate-700 py-4 px-8 text-white flex items-center justify-between">
@@ -38,12 +36,15 @@ export default function Home() {
                     className="px-4 py-2 rounded-md text-black"
                 />
             </div>
-            <div className="flex flex-col items-center h-screen mx-8 my-8">
-                <PriceChart symbolId={focusSymbolId} />
-                <SummaryHighlights symbolId={focusSymbolId} />
-                <RatioTable symbolId={focusSymbolId} />
-                <DrillDownDisplay symbolId={focusSymbolId} />
-            </div>
+            {focusSymbolId &&
+                <div className="flex flex-col items-center h-screen mx-8 my-8">
+                    <PriceChart symbolId={focusSymbolId} />
+                    <SummaryHighlights symbolId={focusSymbolId} />
+                    <RatioTable symbolId={focusSymbolId} />
+                    <DrillDownDisplay symbolId={focusSymbolId} />
+                </div>
+            }
+            
         </div>
     );
 }
