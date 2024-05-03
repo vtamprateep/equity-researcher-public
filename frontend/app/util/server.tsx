@@ -3,6 +3,11 @@ import config from "../../next.config.mjs";
 
 export class ServerRoutes {
 
+    static GET_REQUEST_CONFIG = {
+        method: "GET",
+        headers: { 'Content-Type': 'application/json' },
+    }
+
     /**
      * Returns chart prices given a symbol ID and start / end dates
      * @param symbolId 
@@ -21,10 +26,7 @@ export class ServerRoutes {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_charts/${symbolId}?start_date=${startDate.toISOString().slice(0,10)}&end_date=${endDate.toISOString().slice(0,10)}`
 
         // Execute request
-        return fetch(endpoint, {
-                method: "GET",
-                headers: { 'Content-Type': 'application/json' },
-            })
+        return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
                 .then(res => {
                     if (res.status === 200) {
                         return res.json()
@@ -40,10 +42,7 @@ export class ServerRoutes {
     static async getSymbolId(symbol: string) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbolid/${symbol.toUpperCase()}`
 
-        return fetch(endpoint, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' },
-        })
+        return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
                     return res.json()
@@ -58,10 +57,7 @@ export class ServerRoutes {
      */
     static async getParentIds(symbolId: number) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_parent_ids/${symbolId}`;
-        return fetch(endpoint, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' }
-        })
+        return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
                     return res.json()
@@ -76,10 +72,7 @@ export class ServerRoutes {
      */
     static async getTTMDilutedEPS({symbolId}: {symbolId: number}) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_ttm_diluted_eps/${symbolId}`;
-        return fetch(endpoint, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' }
-        })
+        return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
                     return res.json()
@@ -90,10 +83,7 @@ export class ServerRoutes {
 
     static async getChildIds(symbolId: number) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_child_ids/${symbolId}`;
-        return fetch(endpoint, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' }
-        })
+        return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
                     return res.json()
@@ -104,10 +94,7 @@ export class ServerRoutes {
 
     static async getSymbolNames(symbolIdArr: number[]) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_names?symbol_ids=${symbolIdArr.join(",")}`;
-        return fetch(endpoint, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' }
-        })
+        return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
                     return res.json()
@@ -118,10 +105,7 @@ export class ServerRoutes {
 
     static async getSymbolHighlights(symbolId: number) {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_highlights/${symbolId}`
-        return fetch(endpoint, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' }
-        })
+        return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
                     return res.json()
