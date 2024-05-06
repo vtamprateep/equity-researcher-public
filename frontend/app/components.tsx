@@ -1,7 +1,6 @@
 import { Chart } from 'react-chartjs-2';
 import 'chart.js/auto';
 import { useEffect, useState } from 'react';
-import config from "../next.config.mjs";
 
 import { parse } from "date-fns";
 import 'chartjs-adapter-date-fns';
@@ -148,7 +147,7 @@ export function PriceChart({symbolId}: {symbolId: number}) {
 
 export function DrillDownDisplayCard({symbolName}: {symbolName: string}) {
     return (
-        <div className="bg-grey rounded-lg shadow-md p-4 text-center">
+        <div className="p-4 border border-gray-300 rounded-lg text-white container">
             <h2 className="text-xl font-medium mb-2">{symbolName}</h2>
         </div>
     )
@@ -177,7 +176,7 @@ export function DrillDownDisplay({symbolId}: {symbolId: number}) {
     }, [symbolId])
 
     return(
-        <div className="grid grid-cols-3 gap-4 w-11/12 bg-white">
+        <div className="my-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 container">
             {displayData.map((entry: string) => <DrillDownDisplayCard symbolName={entry} />)}
         </div>
     );

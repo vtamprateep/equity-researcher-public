@@ -15,22 +15,6 @@ const getCharts = async function (req, res) {
     const pathParams = req.params;
     const queryParams = req.query;
 
-    // Set start / end date. Default 1 year lookback.
-    let currentDate = new Date();
-    
-    var endDate = currentDate.toISOString().slice(0, 10);
-    var startDate = new Date(
-        currentDate.getFullYear() - 1, 
-        currentDate.getMonth(), 
-        currentDate.getDate()
-    ).toISOString().slice(0, 10);
-
-    // If both query params provided, set start and end
-    if (queryParams && (queryParams.start_date && queryParams.end_date)) {
-        endDate = queryParams.end_date;
-        startDate = queryParams.start_date;
-    }
-
     // Execute query and return
     pgPool.query(`
         SELECT
@@ -40,7 +24,7 @@ const getCharts = async function (req, res) {
         FROM charts
             LEFT JOIN symbol ON charts.symbol_id = symbol.id
         WHERE symbol_id = ${pathParams.symbol_id}
-            AND close_date BETWEEN '${startDate}' AND '${endDate}'
+            AND close_date BETWEEN '${queryParams.start_date}' AND '${queryParams.end_date}'
         ORDER BY 1
     `)
         .then((result) => res.send(result))
