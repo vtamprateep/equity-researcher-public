@@ -1,7 +1,7 @@
 'use client'
 
 import { RatioTable, PriceChart, DrillDownDisplay, SummaryHighlights } from './components';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ServerRoutes } from './util/server';
 
 

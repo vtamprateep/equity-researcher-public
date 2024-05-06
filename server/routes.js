@@ -34,6 +34,32 @@ const getCharts = async function (req, res) {
         });
 };
 
+/* Get latest daily price change */
+const getLatestPriceChange = async function (req, res) {
+    const queryParams = req.query;
+
+    pgPool.query(`
+        WITH cte_latest_adj_close AS (
+            SELECT
+                symbol.symbol,
+                close_date,
+                adj_close,
+                ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY close_date DESC) AS rank
+            FROM charts
+                LEFT JOIN symbol ON charts.symbol_id = symbol.id
+            WHERE symbol_id IN (${queryParams.symbol_ids})	
+        )
+        SELECT *
+        FROM cte_latest_adj_close
+        WHERE rank <= 2
+    `)
+        .then(result => res.send(result))
+        .catch(error => {
+            console.error("Error executing query:", error);
+            res.status(500).send("Internal Server Error.");
+        })
+}
+
 const getSymbolId = function(req, res) {
     const pathParams = req.params;
 
@@ -183,5 +209,6 @@ module.exports = {
     getTTMDilutedEPS,
     getChildIds,
     getSymbolNames,
-    getSymbolHighlights
+    getSymbolHighlights,
+    getLatestPriceChange
 }

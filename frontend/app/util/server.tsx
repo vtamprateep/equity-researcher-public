@@ -1,4 +1,5 @@
 import config from "../../next.config.mjs";
+import { RouteGetLatestPriceChangeData } from "./types";
 
 
 export class ServerRoutes {
@@ -110,6 +111,28 @@ export class ServerRoutes {
                 if (res.status === 200) {
                     return res.json()
                 } else { throw new Error(`Request getSymbolNames failed with status: ${res.status}`) }
+            })
+            .catch(error => { console.log("Error fetching or processing data:", error) });
+    }
+
+    static async getLatestPriceChange(symbolIdArr: number[]): Promise<any> {
+        let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_latest_price_change/?symbol_ids=${symbolIdArr.join(",")}`;
+        return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
+            .then(res => {
+                if (res.status === 200) {
+                    return res.json();
+                } else { throw new Error(`Request getLatestPriceChange failed with status: ${res.status}`) }
+            })
+            .then(data => {
+                let dataDictionary: {[key: string]: any} = {};
+                data.rows.forEach((entry: RouteGetLatestPriceChangeData) => {
+                    // Check if symbol exists
+                    if (!dataDictionary.hasOwnProperty(entry.symbol)) {
+                        dataDictionary[entry.symbol] = {}
+                    }
+                    dataDictionary[entry.symbol][entry.rank] = entry.adj_close;
+                });
+                return dataDictionary
             })
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }

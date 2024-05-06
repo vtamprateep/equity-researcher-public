@@ -145,10 +145,11 @@ export function PriceChart({symbolId}: {symbolId: number}) {
     );
 }
 
-export function DrillDownDisplayCard({symbolName}: {symbolName: string}) {
+export function DrillDownDisplayCard({symbolName, percentChange}: {symbolName: string, percentChange: number}) {
     return (
         <div className="p-4 border border-gray-300 rounded-lg text-white container">
             <h2 className="text-xl font-medium mb-2">{symbolName}</h2>
+            <h2 className="text-xl font-medium mb-2">{percentChange}</h2>
         </div>
     )
 }
@@ -157,7 +158,7 @@ export function DrillDownDisplayCard({symbolName}: {symbolName: string}) {
  * Displays children symbol ID in cards that user can drill down into
  */
 export function DrillDownDisplay({symbolId}: {symbolId: number}) {
-    const [displayData, setDisplayData] = useState<any[]>([]);
+    const [displayData, setDisplayData] = useState<{[key: string]: number}>();
 
     useEffect(() => {
         ServerRoutes.getChildIds(symbolId)
@@ -168,16 +169,23 @@ export function DrillDownDisplay({symbolId}: {symbolId: number}) {
             })
             .then(res => {
                 if (!res) { return } // Terminate if no child IDs to search
-                ServerRoutes.getSymbolNames(res)
-                    .then((data: any) => {
-                        setDisplayData(data.rows.map((entry: any) => entry.symbol));
+                ServerRoutes.getLatestPriceChange(res)
+                    .then((data: {[key: string]: {[key: number]: number}}) => {
+                        let tempData: {[key: string]: any} = {};
+                        Object.entries(data).map(([key, value]) => {
+                            tempData[key] = (value[1] - value[2]) / value[2];
+                        })
+                        setDisplayData(tempData);
                     })
             });   
     }, [symbolId])
 
     return(
         <div className="my-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 container">
-            {displayData.map((entry: string) => <DrillDownDisplayCard symbolName={entry} />)}
+            {displayData && Object.entries(displayData).map(([key, value]) => (
+                <DrillDownDisplayCard symbolName={key} percentChange={value} />
+            ))}
+            
         </div>
     );
 }
