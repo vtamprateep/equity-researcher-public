@@ -146,10 +146,10 @@ export function PriceChart({symbolId}: {symbolId: number}) {
 }
 
 export function DrillDownDisplayCard({symbolName, percentChange}: {symbolName: string, percentChange: number}) {
+
     return (
-        <div className="p-4 border border-gray-300 rounded-lg text-white container">
-            <h2 className="text-xl font-medium mb-2">{symbolName}</h2>
-            <h2 className="text-xl font-medium mb-2">{percentChange}</h2>
+        <div className={`p-4 border border-gray-300 rounded-lg ${percentChange > 0 ? "text-green-500" : "text-red-500"} container`}>
+            <h2 className="text-xl font-medium mb-2">{symbolName} {percentChange > 0 ? '▲' : '▼'}{(percentChange * 100).toFixed(2)}%</h2>
         </div>
     )
 }
