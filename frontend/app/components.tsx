@@ -138,7 +138,8 @@ export function PriceChart({symbolId}: {symbolId: number}) {
         <div className="container mx-4 my-4">
             <Chart 
                 type="line"
-                data={formatChartsData(chartData)} 
+                data={formatChartsData(chartData)}
+                // @ts-ignore
                 options={chartOptions}
                 className="w-full h-full" />
         </div>
