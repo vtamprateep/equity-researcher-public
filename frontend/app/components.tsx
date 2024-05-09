@@ -27,18 +27,18 @@ export function RatioTable({symbolId}: {symbolId: number}) {
                     })
                 }
             })
-    }, []);
+    }, [symbolId]);
 
     if (Object.keys(ratioData).length !== 0) { // Only render when we have some data point
         return (
             <table>
                 <tr>
                     <td>TTM Diluted EPS</td>
-                    {ratioData.quarter_end.map((date: any) => <td>{date}</td>)}
+                    {ratioData.quarter_end.map((date: any) => <td key={date}>{date}</td>)}
                 </tr>
                 <tr>
                     <td>{ratioData.ttm_diluted_eps}</td>
-                    {ratioData.quarter_diluted_eps.map((eps: any) => <td>{eps}</td>)} 
+                    {ratioData.quarter_diluted_eps.map((eps: any) => <td key={eps}>{eps}</td>)} 
                 </tr>
             </table>
         )
@@ -183,7 +183,7 @@ export function DrillDownDisplay({symbolId}: {symbolId: number}) {
     return(
         <div className="my-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 container">
             {displayData && Object.entries(displayData).map(([key, value]) => (
-                <DrillDownDisplayCard symbolName={key} percentChange={value} />
+                <DrillDownDisplayCard key={key} symbolName={key} percentChange={value} />
             ))}
             
         </div>
