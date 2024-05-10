@@ -162,6 +162,7 @@ export function DrillDownDisplay({symbolId}: {symbolId: number}) {
     const [displayData, setDisplayData] = useState<{[key: string]: number}>();
 
     useEffect(() => {
+        setDisplayData(undefined);
         ServerRoutes.getChildIds(symbolId)
             .then((data: any) => {
                 if (data.rows.length != 0) {
