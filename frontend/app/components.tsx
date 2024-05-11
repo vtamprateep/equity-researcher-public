@@ -29,7 +29,7 @@ export function RatioTable({symbolId}: {symbolId: number}) {
             })
     }, [symbolId]);
 
-    if (Object.keys(ratioData).length !== 0) { // Only render when we have some data point
+    if (Object.keys(ratioData).length !== 0) {
         return (
             <table>
                 <tr>
