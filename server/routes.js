@@ -24,10 +24,10 @@ const getCharts = async function (req, res) {
             adj_close
         FROM charts
             LEFT JOIN symbol ON charts.symbol_id = symbol.id
-        WHERE symbol_id = ${pathParams.symbol_id}
-            AND close_date BETWEEN '${queryParams.start_date}' AND '${queryParams.end_date}'
+        WHERE symbol_id = $1
+            AND close_date BETWEEN $2 AND $3
         ORDER BY 1
-    `)
+    `, [pathParams.symbol_id, queryParams.start_date, queryParams.end_date])
         .then((result) => res.send(result))
         .catch((error) => {
             console.error("Error executing query:", error);
@@ -48,12 +48,12 @@ const getLatestPriceChange = async function (req, res) {
                 ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY close_date DESC) AS rank
             FROM charts
                 LEFT JOIN symbol ON charts.symbol_id = symbol.id
-            WHERE symbol_id IN (${queryParams.symbol_ids})	
+            WHERE symbol_id IN ($1)	
         )
         SELECT *
         FROM cte_latest_adj_close
         WHERE rank <= 2
-    `)
+    `, [queryParams.symbol_ids])
         .then(result => res.send(result))
         .catch(error => {
             console.error("Error executing query:", error);
@@ -68,8 +68,8 @@ const getSymbolId = function(req, res) {
         SELECT
             id
         FROM symbol
-        WHERE symbol = '${pathParams.symbol}'
-    `)
+        WHERE symbol = $1
+    `, [pathParams.symbol])
         .then((result) => res.send(result))
         .catch((error) => {
             console.error("Error executing query:", error);
@@ -85,7 +85,7 @@ const getParentIds = function(req, res) {
             SELECT
                 parent_symbol_ids
             FROM hierarchy
-            WHERE symbol_id = ${pathParams.symbol_id}
+            WHERE symbol_id = $1
         )
         SELECT
             symbol_id,
@@ -94,8 +94,8 @@ const getParentIds = function(req, res) {
         FROM hierarchy
             LEFT JOIN symbol ON symbol.id = hierarchy.symbol_id
         WHERE symbol_id = ANY(SELECT UNNEST(parent_symbol_ids) FROM cte_parent_symbol_id)
-            OR symbol_id = ${pathParams.symbol_id}
-    `)
+            OR symbol_id = $2
+    `, [pathParams.symbol_id, pathParams.symbol_id])
         .then((result) => res.send(result))
         .catch((error) => {
             console.error("Error executing query:", error);
@@ -116,9 +116,9 @@ const getChildIds = function(req, res) {
             symbol_id,
             type
         FROM hierarchy
-        WHERE ${pathParams.parent_symbol_id} = ANY(parent_symbol_ids)
+        WHERE $1 = ANY(parent_symbol_ids)
         LIMIT 50
-    `)
+    `, [pathParams.parent_symbol_id])
         .then((result) => res.send(result))
         .catch((error) => {
             console.error("Error executing query:", error);
@@ -144,11 +144,11 @@ const getTTMDilutedEPS = function(req, res) {
         FROM financials
             LEFT JOIN symbol 
                 ON financials.symbol_id = symbol.id
-        WHERE symbol_id = ${pathParams.symbol_id}
+        WHERE symbol_id = $1
             AND item = 'Diluted EPS'
         ORDER BY 4 DESC
         LIMIT 4
-    `)
+    `, [pathParams.symbol_id])
         .then((result) => res.send(result))
         .catch((error) => {
             console.error("Error executing query:", error);
@@ -169,8 +169,8 @@ const getSymbolNames = function(req, res) {
             id,
             symbol
         FROM symbol
-        WHERE id IN (${queryParams.symbol_ids})
-    `)
+        WHERE id IN ($1)
+    `, [queryParams.symbol_ids])
         .then((result) => res.send(result))
         .catch((error) => {
             console.error("Error executing query:", error);
@@ -192,10 +192,10 @@ const getSymbolHighlights = function(req, res) {
             documents,
             created_on::DATE
         FROM symbol_highlights
-        WHERE symbol_id = ${pathParams.symbol_id}
+        WHERE symbol_id = $1
         ORDER BY 3 DESC
         LIMIT 1;
-    `)
+    `, [pathParams.symbol_id])
         .then(result => {res.send(result)})
         .catch(error => {
             console.error("Error executing query:", error);
