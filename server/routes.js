@@ -48,7 +48,7 @@ const getLatestPriceChange = async function (req, res) {
                 ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY close_date DESC) AS rank
             FROM charts
                 LEFT JOIN symbol ON charts.symbol_id = symbol.id
-            WHERE symbol_id IN ($1)	
+            WHERE symbol_id IN (SELECT UNNEST(STRING_TO_ARRAY($1, ','))::INT)
         )
         SELECT *
         FROM cte_latest_adj_close
