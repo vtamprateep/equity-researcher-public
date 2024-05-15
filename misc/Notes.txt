@@ -1,6 +1,0 @@
-Long-term TODOs:
-- Adjust hierarchy table to list entire lineage of parent symbol IDs in an array to prevent iterative calls to get full lineage
-
-Actual TODOs:
-- Create card component to nicely display child tickers, visualize past day percentage change
-- Get sample Cohere data on following Symbols: SPY, XLC, XLY, XLP, XLE, XLF, XLV, XLI, XLB, XLRE, XLK, XLU, META, AMZN, PG, XOM, JPM, LLY, GE, LIN, PLD, MSFT, NEE

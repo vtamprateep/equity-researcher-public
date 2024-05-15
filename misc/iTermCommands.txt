@@ -1,2 +1,0 @@
-# PSQL command to run SQL script, -d denotes database
-psql -d equity_research -f initialize_database.sql
