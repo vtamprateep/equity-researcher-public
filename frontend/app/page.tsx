@@ -17,7 +17,7 @@ export default function Home() {
     const submitInputHandler = () => {
         if (input != undefined && input.trim() !== "") {
             ServerRoutes.getSymbolId(input.toUpperCase())
-                .then(data => data.rows.length ? setFocusSymbolId(data.rows[0].id) : undefined)
+                .then(data => data.length ? setFocusSymbolId(data[0].id) : undefined)
                 .catch(error => { console.log(error) });
         }
     }

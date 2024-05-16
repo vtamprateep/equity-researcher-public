@@ -1,5 +1,5 @@
 import config from "../../next.config.mjs";
-import { RouteGetLatestPriceChangeData } from "./types";
+import { RouteGetLatestPriceChangeData, SymbolChartData, SymbolHighlights } from "@/types/server";
 
 
 export class ServerRoutes {
@@ -15,7 +15,7 @@ export class ServerRoutes {
      * @param startDate 
      * @param endDate 
      */
-    static async getCharts(symbolId: number, startDate?: Date, endDate?: Date) {
+    static async getCharts(symbolId: number, startDate?: Date, endDate?: Date): Promise<SymbolChartData[]> {
         // Construct URL
         if (startDate === undefined) {
             let year = new Date().getFullYear() - 1;
@@ -30,7 +30,7 @@ export class ServerRoutes {
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
                 .then(res => {
                     if (res.status === 200) {
-                        return res.json()
+                        return res.json().then(data => data.rows);
                     } else { throw new Error(`Request getCharts failed with status: ${res.status}`) }
                 })
                 .catch(error => { console.log("Error fetching or processing data:", error) });
@@ -40,13 +40,13 @@ export class ServerRoutes {
      * Return symbol ID given a symbol string
      * @param symbol
      */
-    static async getSymbolId(symbol: string) {
+    static async getSymbolId(symbol: string): Promise<{id: number}[]> {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbolid/${symbol.toUpperCase()}`
 
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
-                    return res.json()
+                    return res.json().then(data => data.rows);
                 } else { throw new Error(`Request getSymbolId failed with status: ${res.status}`) }
             })
             .catch(error => { console.log("Error fetching or processing data:", error) });
@@ -56,12 +56,12 @@ export class ServerRoutes {
      * Return array containing lineage of symbol IDs
      * @param symbolId
      */
-    static async getParentIds(symbolId: number) {
+    static async getParentIds(symbolId: number): Promise<{symbol_id: number, symbol: string, type: string}[]> {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_parent_ids/${symbolId}`;
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
-                    return res.json()
+                    return res.json().then(data => data.rows);
                 } else { throw new Error(`Request getParentIds failed with status: ${res.status}`) }
             })
             .catch(error => { console.log("Error fetching or processing data:", error) });
@@ -76,40 +76,40 @@ export class ServerRoutes {
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
-                    return res.json()
+                    return res.json().then(data => data.rows);
                 } else { throw new Error(`Request getTTMDilutedEPS failed with status: ${res.status}`) }
             })
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    static async getChildIds(symbolId: number) {
+    static async getChildIds(symbolId: number): Promise<{symbol_id: number, type: string}[]> {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_child_ids/${symbolId}`;
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
-                    return res.json()
+                    return res.json().then(data => data.rows);
                 } else { throw new Error(`Request getChildIds failed with status: ${res.status}`) }
             })
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    static async getSymbolNames(symbolIdArr: number[]) {
+    static async getSymbolNames(symbolIdArr: number[]): Promise<{id: number, symbol: string}[]> {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_names?symbol_ids=${symbolIdArr.join(",")}`;
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
-                    return res.json()
+                    return res.json().then(data => data.rows);
                 } else { throw new Error(`Request getSymbolNames failed with status: ${res.status}`) }
             })
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    static async getSymbolHighlights(symbolId: number) {
+    static async getSymbolHighlights(symbolId: number): Promise<SymbolHighlights[]> {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_highlights/${symbolId}`
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
-                    return res.json()
+                    return res.json().then(data => data.rows);
                 } else { throw new Error(`Request getSymbolNames failed with status: ${res.status}`) }
             })
             .catch(error => { console.log("Error fetching or processing data:", error) });
@@ -120,12 +120,12 @@ export class ServerRoutes {
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
-                    return res.json();
+                    return res.json().then(data => data.rows);
                 } else { throw new Error(`Request getLatestPriceChange failed with status: ${res.status}`) }
             })
             .then(data => {
                 let dataDictionary: {[key: string]: any} = {};
-                data.rows.forEach((entry: RouteGetLatestPriceChangeData) => {
+                data.forEach((entry: RouteGetLatestPriceChangeData) => {
                     // Check if symbol exists
                     if (!dataDictionary.hasOwnProperty(entry.symbol)) {
                         dataDictionary[entry.symbol] = {}

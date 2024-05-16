@@ -6,6 +6,8 @@ import { parse } from "date-fns";
 import 'chartjs-adapter-date-fns';
 import { ServerRoutes } from './util/server';
 
+import { ChartData } from '@/types/component';
+
 
 export function RatioTable({symbolId}: {symbolId: number}) {
     const [ratioData, setRatioData] = useState<any>({});
@@ -93,7 +95,7 @@ export function PriceChart({symbolId}: {symbolId: number}) {
                     return {
                         symbol: entry.symbol,
                         type: entry.type,
-                        data: data.rows.map((entry: any) => ({close_date: entry.close_date, adj_close: entry.adj_close}))
+                        data: data.map((entry: any) => ({close_date: entry.close_date, adj_close: entry.adj_close}))
                     }
                 })
         }));
@@ -130,7 +132,7 @@ export function PriceChart({symbolId}: {symbolId: number}) {
         // Search for parent, if exists get series data
         ServerRoutes.getParentIds(symbolId)
             .then((data: any) => {
-                data.rows.length ? updateChartsData(data.rows) : undefined
+                data.length ? updateChartsData(data) : undefined
             })
     }, [symbolId]);
     
@@ -165,8 +167,8 @@ export function DrillDownDisplay({symbolId}: {symbolId: number}) {
         setDisplayData(undefined);
         ServerRoutes.getChildIds(symbolId)
             .then((data: any) => {
-                if (data.rows.length != 0) {
-                    return data.rows.map((entry: any) => entry.symbol_id);
+                if (data.length != 0) {
+                    return data.map((entry: any) => entry.symbol_id);
                 }
             })
             .then(res => {
@@ -200,9 +202,9 @@ export function SummaryHighlights({symbolId}: {symbolId: number}) {
     useEffect(() => {
         ServerRoutes.getSymbolHighlights(symbolId)
             .then(data => {
-                if (data.rows.length > 0) {
-                    setSummaryText(data.rows[0].highlights);
-                    setSummaryCitations(data.rows[0].documents);
+                if (data.length > 0) {
+                    setSummaryText(data[0].highlights);
+                    setSummaryCitations(data[0].documents);
                 }
             })
     }, [symbolId])
