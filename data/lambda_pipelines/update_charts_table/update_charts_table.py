@@ -523,7 +523,9 @@ def lambda_handler(event, context):
 
     # Pull last week of price data
     end_date = datetime.date.today()
-    start_date = end_date - datetime.timedelta(days=7)
+    end_date = end_date - datetime.timedelta(days=1) # One time to get 2024-05-14 data
+    start_date = end_date - datetime.timedelta(days=1)
+    
     
     symbol_list = [entry["symbol"] for entry in input_symbol]
     data = yf.download(symbol_list, start=start_date, end=end_date)
@@ -557,11 +559,12 @@ def lambda_handler(event, context):
     # Connect and write to supabase
     if len(df_charts_table) == 0:
         print("No data to insert. Returning...")
+        return
         
     supabase_client = create_client(os.environ.get("SUPABASE_API_URL"), os.environ.get("SUPABASE_API_KEY"))
     rows_uploaded = supabase_client.table("charts").insert(new_records).execute()
 
-    if rows_uploaded.count == len(df_charts_table):
-        print(f"Successfully inserted {rows_uploaded} records.")
+    if len(rows_uploaded.data) == len(df_charts_table):
+        print(f"Successfully inserted {len(rows_uploaded.data)} records.")
     else:
-        print(f"Failed to upload, inserted {rows_uploaded.count} out of {len(df_charts_table)} records.")
+        print(f"Failed to upload, inserted {len(rows_uploaded.data)} out of {len(df_charts_table)} records.")
