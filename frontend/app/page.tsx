@@ -1,8 +1,10 @@
 'use client'
 
-import { RatioTable, PriceChart, DrillDownDisplay, SummaryHighlights } from './components';
+import { RatioTable, DrillDownDisplay, SummaryHighlights } from './components';
 import { useState } from 'react';
 import { ServerRoutes } from './util/server';
+
+import { SymbolPriceChart } from "./components/SymbolPriceChart"
 
 
 export default function Home() {
@@ -45,7 +47,7 @@ export default function Home() {
             </div>
             {focusSymbolId &&
                 <div className="flex flex-col items-center h-screen mx-8 my-8">
-                    <PriceChart symbolId={focusSymbolId} />
+                    <SymbolPriceChart symbolId={focusSymbolId} />
                     <SummaryHighlights symbolId={focusSymbolId} />
                     <RatioTable symbolId={focusSymbolId} />
                     <DrillDownDisplay symbolId={focusSymbolId} />

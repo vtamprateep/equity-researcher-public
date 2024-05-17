@@ -1,12 +1,5 @@
-import { Chart } from 'react-chartjs-2';
-import 'chart.js/auto';
 import { useEffect, useState } from 'react';
-
-import { parse } from "date-fns";
-import 'chartjs-adapter-date-fns';
 import { ServerRoutes } from './util/server';
-
-import { ChartData } from '@/types/component';
 
 
 export function RatioTable({symbolId}: {symbolId: number}) {
@@ -45,107 +38,6 @@ export function RatioTable({symbolId}: {symbolId: number}) {
             </table>
         )
     }
-}
-
-export function PriceChart({symbolId}: {symbolId: number}) {
-    const [chartData, setChartData] = useState<ChartData[]>([]);
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            x: {
-                grid: { color: "white" },
-                type: "time",
-                time: {
-                    unit: "day",
-                    displayFormats: {
-                        day: "MMM dd, yyyy"
-                    }
-                },
-                ticks: {
-                    stepSize: 30,
-                    color: "white"
-                }
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: "Adjusted Close ($)",
-                    color: "white",
-                    font: {
-                        size: 16
-                    }
-                },
-                ticks: {
-                    color: "white",
-                }
-            }
-        },
-        plugins: {
-            legend: {
-                labels: { color: "white" }
-            }
-        }
-    }
-
-    const updateChartsData = async (symbolData: any): Promise<void> => {
-        const dataEntries = await Promise.all(symbolData.map(async (entry:any) => {
-            return ServerRoutes.getCharts(entry.symbol_id)
-                .then(data => {
-                    return {
-                        symbol: entry.symbol,
-                        type: entry.type,
-                        data: data.map((entry: any) => ({close_date: entry.close_date, adj_close: entry.adj_close}))
-                    }
-                })
-        }));
-        setChartData(dataEntries);
-    }
-
-    const formatChartsData = (data: ChartData[]) => { // Format data to be put into Chart.js component
-        if (data.length == 0) { // Base case
-            return { labels: [], datasets: [] }
-        }
-
-        let outputChartData = {
-            labels: data[0].data.map(row => parse(row.close_date.slice(0, 10), "yyyy-MM-dd", new Date())),
-            datasets: data.map((entry: any) => {
-                // Set series color
-                let lineColor;
-                if (entry.type == "MARKET") {lineColor = "rgba(211,84,0,1"};
-                if (entry.type == "SECTOR") {lineColor = "rgba(242,121,53,1)"};
-                if (entry.type == "INDIVIDUAL") {lineColor = "rgba(249,191,59,1)"};
-
-                return {
-                    label: entry.symbol,
-                    data: entry.data.map((row: any) => row.adj_close),
-                    borderColor: lineColor,
-                    fill: false
-                }
-            })
-        }
-
-        return outputChartData
-    }
-    
-    useEffect(() => {
-        // Search for parent, if exists get series data
-        ServerRoutes.getParentIds(symbolId)
-            .then((data: any) => {
-                data.length ? updateChartsData(data) : undefined
-            })
-    }, [symbolId]);
-    
-    return (
-        <div className="container mx-4 my-4">
-            <Chart 
-                type="line"
-                data={formatChartsData(chartData)}
-                // @ts-ignore
-                options={chartOptions}
-                className="w-full h-full" />
-        </div>
-    );
 }
 
 export function DrillDownDisplayCard({symbolName, percentChange}: {symbolName: string, percentChange: number}) {
