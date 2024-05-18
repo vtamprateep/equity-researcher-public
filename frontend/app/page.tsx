@@ -6,6 +6,7 @@ import { ServerRoutes } from './util/server';
 import { SymbolPriceChart } from "./components/SymbolPriceChart";
 import { ChildSymbolDisplay } from "./components/ChildSymbolDisplay";
 import { SymbolHighlights } from "./components/SymbolHighlights";
+import { PERatioTable } from './components/PERatioTable';
 
 
 export default function Home() {
@@ -50,7 +51,7 @@ export default function Home() {
                 <div className="flex flex-col items-center h-screen mx-8 my-8">
                     <SymbolPriceChart symbolId={focusSymbolId} />
                     <SymbolHighlights symbolId={focusSymbolId} />
-                    <RatioTable symbolId={focusSymbolId} />
+                    <PERatioTable symbolId={focusSymbolId} />
                     <ChildSymbolDisplay symbolId={focusSymbolId} />
                 </div>
             }

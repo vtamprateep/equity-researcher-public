@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ServerRoutes } from '../util/server';
 
 
-export function RatioTable({symbolId}: {symbolId: number}) {
+export function PERatioTable({symbolId}: {symbolId: number}) {
     const [ratioData, setRatioData] = useState<any>({});
 
     useEffect(() => {
