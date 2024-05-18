@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ServerRoutes } from './util/server';
+import { ServerRoutes } from '../util/server';
 
 
 export function RatioTable({symbolId}: {symbolId: number}) {

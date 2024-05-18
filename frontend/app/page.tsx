@@ -1,6 +1,5 @@
 'use client'
 
-import { RatioTable } from './components';
 import { useState } from 'react';
 import { ServerRoutes } from './util/server';
 
