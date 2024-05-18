@@ -26,7 +26,7 @@ const getCharts = async function (req, res) {
             LEFT JOIN symbol ON charts.symbol_id = symbol.id
         WHERE symbol_id = $1
             AND close_date BETWEEN $2 AND $3
-        ORDER BY 1
+        ORDER BY 1, 2 ASC
     `, [pathParams.symbol_id, queryParams.start_date, queryParams.end_date])
         .then((result) => res.send(result))
         .catch((error) => {

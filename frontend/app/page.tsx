@@ -4,7 +4,8 @@ import { RatioTable, DrillDownDisplay, SummaryHighlights } from './components';
 import { useState } from 'react';
 import { ServerRoutes } from './util/server';
 
-import { SymbolPriceChart } from "./components/SymbolPriceChart"
+import { SymbolPriceChart } from "./components/SymbolPriceChart";
+import { ChildSymbolDisplay } from "./components/ChildSymbolDisplay";
 
 
 export default function Home() {
@@ -50,7 +51,7 @@ export default function Home() {
                     <SymbolPriceChart symbolId={focusSymbolId} />
                     <SummaryHighlights symbolId={focusSymbolId} />
                     <RatioTable symbolId={focusSymbolId} />
-                    <DrillDownDisplay symbolId={focusSymbolId} />
+                    <ChildSymbolDisplay symbolId={focusSymbolId} />
                 </div>
             }
             
