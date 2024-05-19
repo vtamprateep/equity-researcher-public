@@ -52,7 +52,7 @@ export default function Home() {
                     <SymbolPriceChart symbolId={focusSymbolId} />
                     <SymbolHighlights symbolId={focusSymbolId} />
                     <PERatioTable symbolId={focusSymbolId} />
-                    <ChildSymbolDisplay symbolId={focusSymbolId} />
+                    <ChildSymbolDisplay symbolId={focusSymbolId} callback={setFocusSymbolId} />
                 </div>
             }
             

@@ -42,6 +42,7 @@ const getLatestPriceChange = async function (req, res) {
     pgPool.query(`
         WITH cte_latest_adj_close AS (
             SELECT
+                charts.symbol_id,
                 symbol.symbol,
                 close_date,
                 adj_close,
@@ -49,10 +50,24 @@ const getLatestPriceChange = async function (req, res) {
             FROM charts
                 LEFT JOIN symbol ON charts.symbol_id = symbol.id
             WHERE symbol_id IN (SELECT UNNEST(STRING_TO_ARRAY($1, ','))::INT)
+        ),
+        cte_adj_close_pivot AS (
+            SELECT
+              left_t.symbol_id,
+              left_t.symbol,
+              left_t.adj_close AS price_1,
+              right_t.adj_close AS price_2
+            FROM cte_latest_adj_close AS left_t
+              LEFT JOIN cte_latest_adj_close AS right_t
+                ON left_t.symbol_id = right_t.symbol_id
+                  AND right_t.rank = 2
+            WHERE left_t.rank = 1  
         )
-        SELECT *
-        FROM cte_latest_adj_close
-        WHERE rank <= 2
+        SELECT
+            symbol_id,
+            symbol,
+            (price_1 - price_2) / price_2 AS day_pct_change
+        FROM cte_adj_close_pivot
     `, [queryParams.symbol_ids])
         .then(result => res.send(result))
         .catch(error => {

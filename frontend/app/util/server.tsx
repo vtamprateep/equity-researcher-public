@@ -115,24 +115,13 @@ export class ServerRoutes {
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    static async getLatestPriceChange(symbolIdArr: number[]): Promise<any> {
+    static async getLatestPriceChange(symbolIdArr: number[]): Promise<{symbol_id: number, symbol: string, day_pct_change: number}[]> {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_latest_price_change/?symbol_ids=${symbolIdArr.join(",")}`;
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
                     return res.json().then(data => data.rows);
                 } else { throw new Error(`Request getLatestPriceChange failed with status: ${res.status}`) }
-            })
-            .then(data => {
-                let dataDictionary: {[key: string]: any} = {};
-                data.forEach((entry: RouteGetLatestPriceChangeData) => {
-                    // Check if symbol exists
-                    if (!dataDictionary.hasOwnProperty(entry.symbol)) {
-                        dataDictionary[entry.symbol] = {}
-                    }
-                    dataDictionary[entry.symbol][entry.rank] = entry.adj_close;
-                });
-                return dataDictionary
             })
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
