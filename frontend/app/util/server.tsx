@@ -1,5 +1,5 @@
 import config from "../../next.config.mjs";
-import { RouteGetLatestPriceChangeData, SymbolChartData, SymbolHighlights } from "@/types/server";
+import { SymbolChartData, SymbolHighlights } from "@/types/server";
 
 
 export class ServerRoutes {
