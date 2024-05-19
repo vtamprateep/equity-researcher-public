@@ -25,7 +25,7 @@ export function ChildSymbolDisplay({symbolId, callback}: {symbolId: number, call
             {displayData && displayData.map(entry => (
                 <div 
                     key={entry.symbol_id} 
-                    className={`p-4 border border-gray-300 rounded-lg ${entry.day_pct_change > 0 ? "text-green-500" : "text-red-500"} container`}
+                    className={`p-4 border border-gray-300 rounded-lg ${entry.day_pct_change > 0 ? "text-green-500" : "text-red-500"} container hover:border-blue-500 hover:bg-gray-300 container cursor-pointer`}
                     onClick={() => {if (callback) {callback(entry.symbol_id)}}}
                 >
                     <h2 className="text-xl font-medium mb-2">{entry.symbol} {entry.day_pct_change > 0 ? '▲' : '▼'}{(entry.day_pct_change * 100).toFixed(2)}%</h2>
