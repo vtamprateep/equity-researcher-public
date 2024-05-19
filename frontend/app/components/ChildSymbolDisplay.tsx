@@ -23,7 +23,11 @@ export function ChildSymbolDisplay({symbolId, callback}: {symbolId: number, call
     return(
         <div className="my-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 container">
             {displayData && displayData.map(entry => (
-                <div key={entry.symbol_id} className={`p-4 border border-gray-300 rounded-lg ${entry.day_pct_change > 0 ? "text-green-500" : "text-red-500"} container`}>
+                <div 
+                    key={entry.symbol_id} 
+                    className={`p-4 border border-gray-300 rounded-lg ${entry.day_pct_change > 0 ? "text-green-500" : "text-red-500"} container`}
+                    onClick={() => {if (callback) {callback(entry.symbol_id)}}}
+                >
                     <h2 className="text-xl font-medium mb-2">{entry.symbol} {entry.day_pct_change > 0 ? '▲' : '▼'}{(entry.day_pct_change * 100).toFixed(2)}%</h2>
                 </div>
             ))}
