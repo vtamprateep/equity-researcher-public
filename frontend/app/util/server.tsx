@@ -40,7 +40,7 @@ export class ServerRoutes {
      * Return symbol ID given a symbol string
      * @param symbol
      */
-    static async getSymbolId(symbol: string): Promise<{id: number}[]> {
+    static async getSymbolId(symbol: string): Promise<{id: number, symbol: string, type: string}[]> {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbolid/${symbol.toUpperCase()}`
 
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
@@ -82,8 +82,8 @@ export class ServerRoutes {
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    static async getChildIds(symbolId: number): Promise<{symbol_id: number, type: string}[]> {
-        let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_child_ids/${symbolId}`;
+    static async getChildIds(symbolId: number, type: string): Promise<{symbol_id: number, type: string}[]> {
+        let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_child_ids/${symbolId}?type=${type}`;
         return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
             .then(res => {
                 if (res.status === 200) {
