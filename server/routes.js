@@ -81,8 +81,12 @@ const getSymbolId = function(req, res) {
 
     pgPool.query(`
         SELECT
-            id
+            id,
+            symbol,
+            hierarchy.type
         FROM symbol
+            LEFT JOIN hierarchy
+                ON hierarchy.symbol_id = symbol.id
         WHERE symbol = $1
     `, [pathParams.symbol])
         .then((result) => res.send(result))
@@ -125,6 +129,7 @@ const getParentIds = function(req, res) {
  */
 const getChildIds = function(req, res) {
     const pathParams = req.params;
+    const queryParams = req.query;
 
     pgPool.query(`
         SELECT
@@ -132,8 +137,9 @@ const getChildIds = function(req, res) {
             type
         FROM hierarchy
         WHERE $1 = ANY(parent_symbol_ids)
+            AND type = $2
         LIMIT 50
-    `, [pathParams.parent_symbol_id])
+    `, [pathParams.parent_symbol_id, queryParams.type])
         .then((result) => res.send(result))
         .catch((error) => {
             console.error("Error executing query:", error);
