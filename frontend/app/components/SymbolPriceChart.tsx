@@ -8,7 +8,7 @@ import { ServerRoutes } from '../util/server';
 import { ChartData } from '@/types/component';
 
 
-function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback: Function, defaultMode: string}) {
+function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback: Function, defaultMode?: string}) {
     const [mode, setMode] = useState<string>(defaultMode);
 
     const HOVER_CSS = "bg-white text-blue-500 border-blue-500";
@@ -16,6 +16,7 @@ function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback: Funct
 
     const handleModeChange = (value: string) => {
         setMode(value);
+        callback(value);
     }
 
     return (
@@ -57,10 +58,10 @@ function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback: Funct
 
 export function SymbolPriceChart({symbolId}: {symbolId: number}) {
     const [displayMode, setDisplayMode] = useState<string>("$");
-    const [displayPeriod, setDisplayPeriod] = useState<string>("1Y");
+    const [displayPeriod, setDisplayPeriod] = useState<string>("1YR");
     const [displayData, setDisplayData] = useState<ChartData[]>([]);
 
-    const [symbolArr, setSymbolArr] = useState<{symbol_id: number, symbol: string,type: string}[]>();
+    const [symbolIdArr, setSymbolArr] = useState<{symbol_id: number, symbol: string, type: string}[]>();
     const [dataDollarForm, setDataDollarForm] = useState<ChartData[]>([]);
     const [dataPctForm, setDataPctForm] = useState<ChartData[]>([]);
     const chartOptions = {
@@ -109,13 +110,29 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
         }
     }
 
-    const handlePeriodModeChange = (period: string): void => { // TODO: Write function to handle time period button clicks
-
-    }
-
-    const updateChartsData = async (symbolData: any): Promise<void> => {
+    const updateChartsData = async (symbolData: {symbol_id: number, symbol: string, type: string}[], period: string): Promise<void> => {
+        // Define start / end date
+        let endDate = new Date();
+        let startDate = new Date();
+        switch (period) {
+            case "1WK":
+                startDate.setDate(endDate.getDate() - 7);
+                break;
+            case "1M":
+                startDate.setMonth(endDate.getMonth() - 1);
+                break;
+            case "3M":
+                startDate.setMonth(endDate.getMonth() - 3);
+                break;
+            case "6M":
+                startDate.setMonth(endDate.getMonth() - 6);
+                break;
+            case "1YR":
+                startDate.setFullYear(endDate.getFullYear() - 1);
+                break;
+        }
         const dataEntries = await Promise.all(symbolData.map(async (entry: any) => {
-            return ServerRoutes.getCharts(entry.symbol_id)
+            return ServerRoutes.getCharts(entry.symbol_id, startDate, endDate)
                 .then(data => {
                     return {
                         symbol: entry.symbol,
@@ -136,7 +153,7 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
             }
         });
         setDataPctForm(pctDataEntries);
-        setDisplayData(dataEntries);
+        displayMode === "$" ? setDisplayData(dataEntries) : setDisplayData(pctDataEntries);
     }
 
     const formatChartsData = (data: ChartData[]) => {
@@ -174,15 +191,22 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
     }
     
     useEffect(() => {
-        setDisplayMode("$");
         setSymbolArr([]);
         // Search for parent, if exists get series data
         ServerRoutes.getParentIds(symbolId)
             .then((data) => {
                 setSymbolArr(data);
-                data.length ? updateChartsData(data) : undefined
+                data.length ? updateChartsData(data, displayPeriod) : undefined
             })
     }, [symbolId]);
+
+    useEffect(() => { // When display period changes
+        if (symbolIdArr && symbolIdArr.length !== 0) {
+
+            updateChartsData(symbolIdArr, displayPeriod);
+        }
+
+    }, [displayPeriod])
     
     return (
         <div className="container">
@@ -203,8 +227,8 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
                 >
                 %
                 </button>
-                {/* Add buttons for time period selection */}
             </div>
+            <DisplayPeriodModeToggle callback={setDisplayPeriod} />
             <div className="container mx-4 my-4">
                 <Chart 
                     type="line"
