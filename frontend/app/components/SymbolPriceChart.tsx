@@ -85,7 +85,7 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
             y: {
                 title: {
                     display: true,
-                    text: "Adjusted Close ($)",
+                    text: `Adjusted Close (${displayMode})`,
                     color: "white",
                     font: {
                         size: 16

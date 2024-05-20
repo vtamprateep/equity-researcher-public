@@ -8,11 +8,16 @@ export function SymbolHighlights({symbolId}: {symbolId: number}) {
     const [showCitations, setShowCitations] = useState<boolean>(false);
 
     useEffect(() => {
+        setSummaryText(undefined);
+        setSummaryCitations([]);
         ServerRoutes.getSymbolHighlights(symbolId)
             .then(data => {
                 if (data.length > 0) {
                     setSummaryText(data[0].highlights);
                     setSummaryCitations(data[0].documents);
+                } else {
+                    setSummaryText("No highlights to show.");
+                    setSummaryCitations([]);
                 }
             })
     }, [symbolId])

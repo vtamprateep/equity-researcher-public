@@ -5,6 +5,8 @@ export interface SymbolChartData {
 }
 
 export interface SymbolHighlights {
+    id: number,
+    symbol: string,
     highlights: string,
     documents: string[],
     created_on: Date
