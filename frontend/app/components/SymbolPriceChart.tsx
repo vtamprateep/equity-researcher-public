@@ -8,10 +8,59 @@ import { ServerRoutes } from '../util/server';
 import { ChartData } from '@/types/component';
 
 
+function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback: Function, defaultMode: string}) {
+    const [mode, setMode] = useState<string>(defaultMode);
+
+    const HOVER_CSS = "bg-white text-blue-500 border-blue-500";
+    const BASE_CSS = "bg-blue-500 text-white";
+
+    const handleModeChange = (value: string) => {
+        setMode(value);
+    }
+
+    return (
+        <div className="flex justify-center">
+            <button
+                onClick={() => handleModeChange("1WK")}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "1WK" ? BASE_CSS : HOVER_CSS}`}
+            >
+            1WK
+            </button>
+            <button
+                onClick={() => handleModeChange("1M")}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "1M" ? BASE_CSS : HOVER_CSS}`}
+            >
+            1M
+            </button>
+            <button
+                onClick={() => handleModeChange("3M")}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "3M" ? BASE_CSS : HOVER_CSS}`}
+            >
+            3M
+            </button>
+            <button
+                onClick={() => handleModeChange("6M")}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "6M" ? BASE_CSS : HOVER_CSS}`}
+            >
+            6M
+            </button>
+            <button
+                onClick={() => handleModeChange("1YR")}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "1YR" ? BASE_CSS : HOVER_CSS}`}
+            >
+            1YR
+            </button>
+        </div>
+        
+    )
+}
+
 export function SymbolPriceChart({symbolId}: {symbolId: number}) {
     const [displayMode, setDisplayMode] = useState<string>("$");
+    const [displayPeriod, setDisplayPeriod] = useState<string>("1Y");
     const [displayData, setDisplayData] = useState<ChartData[]>([]);
 
+    const [symbolArr, setSymbolArr] = useState<{symbol_id: number, symbol: string,type: string}[]>();
     const [dataDollarForm, setDataDollarForm] = useState<ChartData[]>([]);
     const [dataPctForm, setDataPctForm] = useState<ChartData[]>([]);
     const chartOptions = {
@@ -53,13 +102,15 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
         }
     }
 
-    const handleDisplayModeChange = (mode: string): undefined => {
+    const handleDisplayModeChange = (mode: string): void => {
         if (mode !== displayMode) {
-            setDisplayMode(mode)
-            
-            if (mode === "$") {setDisplayData(dataDollarForm)}
-            if (mode === "%") {setDisplayData(dataPctForm)}
+            setDisplayMode(mode);
+            mode === "$" ? setDisplayData(dataDollarForm) : setDisplayData(dataPctForm);
         }
+    }
+
+    const handlePeriodModeChange = (period: string): void => { // TODO: Write function to handle time period button clicks
+
     }
 
     const updateChartsData = async (symbolData: any): Promise<void> => {
@@ -77,7 +128,6 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
 
         // Calculate 0% indexed series
         const pctDataEntries = dataEntries.map(entry => {
-            // Grab first price as baseline, calculate percent change for each date
             let firstAdjClose = entry.data[0].adj_close;
             return {
                 symbol: entry.symbol,
@@ -99,9 +149,17 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
             datasets: data.map((entry: any) => {
                 // Set series color
                 let lineColor;
-                if (entry.type == "MARKET") {lineColor = "rgba(211,84,0,1"};
-                if (entry.type == "SECTOR") {lineColor = "rgba(242,121,53,1)"};
-                if (entry.type == "INDIVIDUAL") {lineColor = "rgba(249,191,59,1)"};
+                switch (entry.type) {
+                    case "MARKET":
+                        lineColor = "rgba(211,84,0,1";
+                        break;
+                    case "SECTOR":
+                        lineColor = "rgba(242,121,53,1)";
+                        break;
+                    case "INDIVIDUAL":
+                        lineColor = "rgba(249,191,59,1)";
+                        break;
+                }
 
                 return {
                     label: entry.symbol,
@@ -117,9 +175,11 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
     
     useEffect(() => {
         setDisplayMode("$");
+        setSymbolArr([]);
         // Search for parent, if exists get series data
         ServerRoutes.getParentIds(symbolId)
-            .then((data: any) => {
+            .then((data) => {
+                setSymbolArr(data);
                 data.length ? updateChartsData(data) : undefined
             })
     }, [symbolId]);
@@ -127,22 +187,23 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
     return (
         <div className="container">
             <div className="flex justify-center">
-            <button
-                onClick={() => handleDisplayModeChange('$')}
-                className={`px-4 py-2 mr-2 font-semibold border rounded ${
-                    displayMode === '$' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 border-blue-500'
-                }`}
-            >
-            $
-            </button>
-            <button
-                onClick={() => handleDisplayModeChange('%')}
-                className={`px-4 py-2 font-semibold border rounded ${
-                    displayMode === '%' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 border-blue-500'
-                }`}
-            >
-            %
-            </button>
+                <button
+                    onClick={() => handleDisplayModeChange('$')}
+                    className={`px-4 py-2 mr-2 font-semibold border rounded ${
+                        displayMode === '$' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 border-blue-500'
+                    }`}
+                >
+                $
+                </button>
+                <button
+                    onClick={() => handleDisplayModeChange('%')}
+                    className={`px-4 py-2 font-semibold border rounded ${
+                        displayMode === '%' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 border-blue-500'
+                    }`}
+                >
+                %
+                </button>
+                {/* Add buttons for time period selection */}
             </div>
             <div className="container mx-4 my-4">
                 <Chart 
