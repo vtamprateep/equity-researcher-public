@@ -229,7 +229,7 @@ const getSymbolHighlights = function(req, res) {
             let entry = result.rows[0]
             let entryDayAge = 9999;
             
-            if (entry.created_in !== null) {
+            if (entry.created_on !== null) {
                 entryDayAge = (new Date().getTime() - entry.created_on.getTime()) / (1000 * 3600 * 24)
             }
             
