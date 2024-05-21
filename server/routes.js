@@ -225,9 +225,16 @@ const getSymbolHighlights = function(req, res) {
         LIMIT 1;
     `, [pathParams.symbol_id])
         .then(result => {
-            // No return value, call API and load into database
+            // Get entry and calculate age
             let entry = result.rows[0]
-            if (entry.highlights !== null) {
+            let entryDayAge = 9999;
+            
+            if (entry.created_in !== null) {
+                entryDayAge = (new Date().getTime() - entry.created_on.getTime()) / (1000 * 3600 * 24)
+            }
+            
+            // No return value or 7+ days stale, call API and insert new record into database
+            if (entry.highlights !== null && entryDayAge < 7) {
                 res.send(result);
             } else {
                 const cohere = new CohereClient({token: process.env.COHERE_API_KEY});
