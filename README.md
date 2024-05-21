@@ -13,13 +13,14 @@ The Stock Research Platform is designed to provide users with a comprehensive an
 You can preview the website here: http://3.14.6.185:3000/
 
 ## Key Features
-- **Hierarchical Navigation**: Users can drill down from market indices to individual stocks.
-- **News Summarization**: Utilizes Cohere.ai to scrape and summarize stock news highlights with citations.
+- **Hierarchical Navigation**: Users can drill down from market indices to individual stocks by clicking on drill down stock cards.
+- **News Summarization**: Utilizes Cohere.ai to scrape and summarize stock news highlights with citations. Summary updates if last update is greater than 7 days old.
 - **Data Coverage**: Contains data on all stocks in the S&P 500.
-- **Price Visualization**: Visualizes stock price action over time.
+- **Price Visualization**: Visualizes stock price action over time. Can toggle time period of visualization as well as whether the graph is percent indexed or absolute price based.
 
 ## Challenges Faced
 - Finding and formatting data sources to seed stock information.
+- Implementing lazy load on RAG-based stock summarization to avoid hitting API too many times.
 - Setting up hosting on EC2 and automating basic CI/CD for deployment.
 - Learning and implementing security measures to protect against SQL injection.
 - Acquiring basic DevOps skills to automate CI/CD pipelines.
@@ -32,11 +33,13 @@ You can preview the website here: http://3.14.6.185:3000/
 
 ## Future Plans
 - Incorporate analyst insights to enrich stock research capabilities.
-- Integrate data sources for updating the database with daily stock prices.
-- Schedule jobs to refresh weekly summarized insights and citations.
-- Enhance stock price visualization by indexing to percent gain.
+- Build in new page to contain market level metrics such as inflation, interest rates, GDP, etc.
+- Build log-in flow for users to register and create account
+- Build investment thesis framework, allowing users to input stock perspective on whether it is buy / sell
 
 ## Screenshots
-![image](https://github.com/vtamprateep/value-investing-research-platform/assets/19770736/03218ef2-f4bc-4b26-8ef1-695f475536cf)
-![Screenshot 2024-05-10 at 4 01 45 PM](https://github.com/vtamprateep/value-investing-research-platform/assets/19770736/0149462d-7b22-4f47-b82c-c4749abbdcd2)
+<img width="1076" alt="image" src="https://github.com/vtamprateep/equity-researcher/assets/19770736/9d9e59e7-3b86-4505-b05b-8a955ba45fac">
+<img width="1257" alt="image" src="https://github.com/vtamprateep/equity-researcher/assets/19770736/a0198b3e-5746-49c6-a9a0-3fd91365ee4c">
+<img width="1048" alt="image" src="https://github.com/vtamprateep/equity-researcher/assets/19770736/21780d9b-0bce-4ec9-9cee-f918d7554b00">
+
 
