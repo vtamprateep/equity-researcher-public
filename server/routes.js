@@ -221,7 +221,7 @@ const getSymbolHighlights = function(req, res) {
             LEFT JOIN symbol_highlights
                 ON symbol.id = symbol_highlights.symbol_id
         WHERE symbol.id = $1
-        ORDER BY 3 DESC
+        ORDER BY 5 DESC
         LIMIT 1;
     `, [pathParams.symbol_id])
         .then(result => {
