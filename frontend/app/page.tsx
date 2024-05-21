@@ -37,7 +37,7 @@ export default function Home() {
                         value={input}
                         onChange={updateInput}
                         onKeyDown={(e) => {if (e.key === "Enter" && input && input.trim()) { updateFocusSymbol(input.toUpperCase()) }}}
-                        placeholder="Enter ticker symbol here..."
+                        placeholder="Try searching 'SPY' to start..."
                         className="px-4 py-2 rounded-md text-black"
                     />
                     <button 
