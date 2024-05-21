@@ -20,7 +20,7 @@ function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback: Funct
     }
 
     return (
-        <div className="flex justify-center">
+        <div className="flex justify-center my-2">
             <button
                 onClick={() => handleModeChange("1WK")}
                 className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "1WK" ? BASE_CSS : HOVER_CSS}`}
