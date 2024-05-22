@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ServerRoutes } from '../util/server';
 
 
@@ -27,6 +27,7 @@ export function SymbolHighlights({symbolId}: {symbolId: number}) {
     const [summaryText, setSummaryText] = useState<string>();
     const [summaryCitations, setSummaryCitations] = useState<string[]>([]);
     const [showCitations, setShowCitations] = useState<boolean>(false);
+    const abortControllerRef = useRef<AbortController>();
 
     useEffect(() => {
         // Reset states
@@ -35,8 +36,12 @@ export function SymbolHighlights({symbolId}: {symbolId: number}) {
         setSummaryCitations([]);
         setShowCitations(false);
 
+        // Set abort controller
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
         // Retrieve highlights, update isLoading state
-        ServerRoutes.getSymbolHighlights(symbolId)
+        ServerRoutes.getSymbolHighlights(symbolId, controller.signal)
             .then(data => {
                 if (data.length > 0) {
                     setSummaryText(data[0].highlights);
@@ -47,6 +52,14 @@ export function SymbolHighlights({symbolId}: {symbolId: number}) {
                 }
                 setIsLoading(false);
             })
+            .catch(error => {
+                if (error.name !== 'AbortError') {
+                    console.error('Fetch error:', error);
+                }
+            })
+
+        // Abort request if change symbolId
+        return () => { controller.abort(); }
     }, [symbolId])
 
     if (isLoading) { 

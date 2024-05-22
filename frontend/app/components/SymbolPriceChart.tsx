@@ -202,10 +202,8 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
 
     useEffect(() => { // When display period changes
         if (symbolIdArr && symbolIdArr.length !== 0) {
-
             updateChartsData(symbolIdArr, displayPeriod);
         }
-
     }, [displayPeriod])
     
     return (

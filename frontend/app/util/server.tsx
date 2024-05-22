@@ -104,9 +104,14 @@ export class ServerRoutes {
             .catch(error => { console.log("Error fetching or processing data:", error) });
     }
 
-    static async getSymbolHighlights(symbolId: number): Promise<SymbolHighlights[]> {
+    static async getSymbolHighlights(symbolId: number, signal?: AbortSignal): Promise<SymbolHighlights[]> {
         let endpoint = `http://${config?.env?.SERVER_HOST}:${config?.env?.SERVER_PORT}/get_symbol_highlights/${symbolId}`
-        return fetch(endpoint, ServerRoutes.GET_REQUEST_CONFIG)
+        const request_config = {
+            ...ServerRoutes.GET_REQUEST_CONFIG,
+            signal: signal
+        };
+
+        return fetch(endpoint, request_config)
             .then(res => {
                 if (res.status === 200) {
                     return res.json().then(data => data.rows);
