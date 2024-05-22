@@ -45,7 +45,5 @@ const getSymbolNames = function(req, res) {
 
 module.exports = {
     getSymbolId,
-    getParentIds,
-    getChildIds,
     getSymbolNames,
 }
