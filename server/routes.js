@@ -1,18 +1,6 @@
-const { Pool } = require('pg');
-const config = require('./config.json');
-require("dotenv").config();
-
+const pgPool = require("./util/db.js");
 const { CohereClient } = require("cohere-ai");
 
-
-// Create client and connect
-const pgPool = new Pool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME
-});
 
 /* Route to get daily charts data. Would be cool to increase / decrease granularity by week / month */
 const getCharts = async function (req, res) {
