@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react';
-import { ServerRoutes } from './util/server';
+import { ServerRoutes } from '../util/server';
 
-import { SymbolPriceChart } from "./components/SymbolPriceChart";
-import { ChildSymbolDisplay } from "./components/ChildSymbolDisplay";
-import { SymbolHighlights } from "./components/SymbolHighlights";
-import { PERatioTable } from './components/PERatioTable';
+import { SymbolPriceChart } from "../components/SymbolPriceChart";
+import { ChildSymbolDisplay } from "../components/ChildSymbolDisplay";
+import { SymbolHighlights } from "../components/SymbolHighlights";
+import { PERatioTable } from '../components/PERatioTable';
 
 
 export default function Home() {

@@ -1,4 +1,4 @@
-import config from "../../next.config.mjs";
+import config from "../next.config.mjs";
 import { SymbolChartData, SymbolHighlights } from "@/types/server";
 
 
