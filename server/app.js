@@ -25,6 +25,4 @@ app.get("/get_ttm_diluted_eps/:symbol_id", financialsRoutes.getTTMDilutedEPS);
 app.get("/get_symbolid/:symbol", symbolRoutes.getSymbolId);
 app.get("/get_symbol_names", symbolRoutes.getSymbolNames);
 
-
-
 module.exports = app;
