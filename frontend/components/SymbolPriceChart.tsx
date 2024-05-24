@@ -8,7 +8,7 @@ import { ServerRoutes } from '../util/server';
 import { ChartData } from '@/types/component';
 
 
-function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback: Function, defaultMode?: string}) {
+export function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback: Function, defaultMode?: string}) {
     const [mode, setMode] = useState<string>(defaultMode);
 
     const HOVER_CSS = "bg-white text-blue-500 border-blue-500";
