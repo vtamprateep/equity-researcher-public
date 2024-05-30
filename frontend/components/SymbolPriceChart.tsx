@@ -56,6 +56,39 @@ export function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback
     )
 }
 
+export function DisplayUnitModeToggle({callback, defaultMode="$"}: {callback: Function, defaultMode?: string}) {
+    const [mode, setMode] = useState<string>(defaultMode);
+
+    const BASE_CSS = "bg-white text-blue-500 border-blue-500";
+    const FOCUS_CSS = "bg-blue-500 text-white";
+
+    const handleModeChange = (value: string) => {
+        setMode(value);
+        callback(value);
+    }
+
+    return (
+        <div className="flex justify-center">
+            <button
+                onClick={() => handleModeChange('$')}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${
+                    mode === '$' ? FOCUS_CSS : BASE_CSS
+                }`}
+            >
+            $
+            </button>
+            <button
+                onClick={() => handleModeChange('%')}
+                className={`px-4 py-2 font-semibold border rounded ${
+                    mode === '%' ? FOCUS_CSS : BASE_CSS
+                }`}
+            >
+            %
+            </button>
+        </div>
+    )    
+}
+
 export function SymbolPriceChart({symbolId}: {symbolId: number}) {
     const [displayMode, setDisplayMode] = useState<string>("$");
     const [displayPeriod, setDisplayPeriod] = useState<string>("1YR");
@@ -100,13 +133,6 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
             legend: {
                 labels: { color: "white" }
             }
-        }
-    }
-
-    const handleDisplayModeChange = (mode: string): void => {
-        if (mode !== displayMode) {
-            setDisplayMode(mode);
-            mode === "$" ? setDisplayData(dataDollarForm) : setDisplayData(dataPctForm);
         }
     }
 
@@ -205,27 +231,14 @@ export function SymbolPriceChart({symbolId}: {symbolId: number}) {
             updateChartsData(symbolIdArr, displayPeriod);
         }
     }, [displayPeriod])
+
+    useEffect(() => {
+        displayMode === "$" ? setDisplayData(dataDollarForm) : setDisplayData(dataPctForm)
+    }, [displayMode])
     
     return (
         <div className="container">
-            <div className="flex justify-center">
-                <button
-                    onClick={() => handleDisplayModeChange('$')}
-                    className={`px-4 py-2 mr-2 font-semibold border rounded ${
-                        displayMode === '$' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 border-blue-500'
-                    }`}
-                >
-                $
-                </button>
-                <button
-                    onClick={() => handleDisplayModeChange('%')}
-                    className={`px-4 py-2 font-semibold border rounded ${
-                        displayMode === '%' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 border-blue-500'
-                    }`}
-                >
-                %
-                </button>
-            </div>
+            <DisplayUnitModeToggle callback={setDisplayMode} />
             <DisplayPeriodModeToggle callback={setDisplayPeriod} />
             <div className="container mx-4 my-4">
                 <Chart 

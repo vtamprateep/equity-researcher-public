@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { DisplayPeriodModeToggle } from '../../components/SymbolPriceChart';
+import { DisplayPeriodModeToggle, DisplayUnitModeToggle } from '../../components/SymbolPriceChart';
 
 
 describe('DisplayPeriodModeToggle', () => {
@@ -37,5 +37,30 @@ describe('DisplayPeriodModeToggle', () => {
         // Click on 6M
         fireEvent.click(button6M);
         expect(mockCallback).toHaveBeenCalledWith('6M');
+    });
+});
+
+describe('DisplayUnitModeToggle', () => {
+    it("has initial state set to $", () => {
+        const mockCallback = jest.fn();
+        render(<DisplayUnitModeToggle callback={mockCallback} />);
+
+        const buttonDollar = screen.getByText('$');
+        expect(buttonDollar).toHaveClass("px-4 py-2 mr-2 font-semibold border rounded bg-blue-500 text-white");
+    })
+
+    it("updates state and calls callback when a button is clicked", () => {
+        const mockCallback = jest.fn();
+        render(<DisplayUnitModeToggle callback={mockCallback} />);
+    
+        const buttonDollar = screen.getByText('$');
+        const buttonPct = screen.getByText('%');
+    
+        // Click buttons
+        fireEvent.click(buttonPct);
+        expect(mockCallback).toHaveBeenCalledWith('%');
+
+        fireEvent.click(buttonDollar);
+        expect(mockCallback).toHaveBeenCalledWith('$');
     });
 });
