@@ -11,8 +11,8 @@ import { ChartData } from '@/types/component';
 export function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback: Function, defaultMode?: string}) {
     const [mode, setMode] = useState<string>(defaultMode);
 
-    const HOVER_CSS = "bg-white text-blue-500 border-blue-500";
-    const BASE_CSS = "bg-blue-500 text-white";
+    const BASE_CSS = "bg-white text-blue-500 border-blue-500";
+    const FOCUS_CSS = "bg-blue-500 text-white";
 
     const handleModeChange = (value: string) => {
         setMode(value);
@@ -23,31 +23,31 @@ export function DisplayPeriodModeToggle({callback, defaultMode="1YR"}: {callback
         <div className="flex justify-center my-2">
             <button
                 onClick={() => handleModeChange("1WK")}
-                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "1WK" ? BASE_CSS : HOVER_CSS}`}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "1WK" ? FOCUS_CSS : BASE_CSS}`}
             >
             1WK
             </button>
             <button
                 onClick={() => handleModeChange("1M")}
-                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "1M" ? BASE_CSS : HOVER_CSS}`}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "1M" ? FOCUS_CSS : BASE_CSS}`}
             >
             1M
             </button>
             <button
                 onClick={() => handleModeChange("3M")}
-                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "3M" ? BASE_CSS : HOVER_CSS}`}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "3M" ? FOCUS_CSS : BASE_CSS}`}
             >
             3M
             </button>
             <button
                 onClick={() => handleModeChange("6M")}
-                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "6M" ? BASE_CSS : HOVER_CSS}`}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "6M" ? FOCUS_CSS : BASE_CSS}`}
             >
             6M
             </button>
             <button
                 onClick={() => handleModeChange("1YR")}
-                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "1YR" ? BASE_CSS : HOVER_CSS}`}
+                className={`px-4 py-2 mr-2 font-semibold border rounded ${mode === "1YR" ? FOCUS_CSS : BASE_CSS}`}
             >
             1YR
             </button>
