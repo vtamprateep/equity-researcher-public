@@ -1,7 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { DisplayPeriodModeToggle, DisplayUnitModeToggle } from '../../components/SymbolPriceChart';
+import { render, screen, fireEvent } from '@testing-library/react';
+
+import { ServerRoutes } from '../../util/server';
+import { SymbolPriceChart, DisplayPeriodModeToggle, DisplayUnitModeToggle } from '../../components/SymbolPriceChart';
+
+// TODO: Test SymbolPriceChart component
 
 
 describe('DisplayPeriodModeToggle', () => {
