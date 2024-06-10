@@ -10,7 +10,7 @@ The Stock Research Platform is designed to provide users with a comprehensive an
 - **Language Model**: Cohere.ai (LLM)
 
 ## Getting Started
-You can preview the website here: http://3.14.6.185:3000/
+You can preview the website here: [http://3.14.6.185:3000/](http://3.142.146.107:3000/)
 
 ## Key Features
 - **Hierarchical Navigation**: Users can drill down from market indices to individual stocks by clicking on drill down stock cards.
