@@ -1,5 +1,8 @@
 # Equity Researcher Platform
 
+### (IMPORTANT): As of May 30 2024, this repository will only contain text updates made to the application but no longer contain code updates.
+This is because I would like to continue to develop and polish this application long-term and may make changes that I do not want others to potentially copy. A monthly log of updates / changes will be maintained at the bottom.
+
 ## Purpose
 The Stock Research Platform is designed to provide users with a comprehensive and intuitive way to visualize stock information in a hierarchical manner. It allows users to drill down from broad market indices, such as SPY, to sector ETFs like XLK, and further into individual stocks like MSFT. This hierarchical representation aims to simplify the navigation of complex stock data, making it easier for users to conduct in-depth research.
 
@@ -30,6 +33,11 @@ You can preview the website here: [http://3.142.146.107:3000/](http://3.142.146.
 - Understand how to mitigate security risks, such as SQL injection, in database interactions.
 - Learn cloud infrastructure management, including instance provisioning and application deployment.
 - Implement basic DevOps practices to automate continuous integration and deployment processes.
+
+## Updates & Changes
+### June 2024
+- Implemented authentication flow using Supabase, allowing users to create accounts and log-in.
+- Implemented daily summary metrics at bottom of stock charts, updated daily.
 
 ## Future Plans
 - Incorporate analyst insights to enrich stock research capabilities.
