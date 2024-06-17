@@ -39,12 +39,6 @@ You can preview the website here: [http://3.142.146.107:3000/](http://3.142.146.
 - Implemented authentication flow using Supabase, allowing users to create accounts and log-in.
 - Implemented daily summary metrics at bottom of stock charts, updated daily.
 
-## Future Plans
-- Incorporate analyst insights to enrich stock research capabilities.
-- Build in new page to contain market level metrics such as inflation, interest rates, GDP, etc.
-- Build log-in flow for users to register and create account
-- Build investment thesis framework, allowing users to input stock perspective on whether it is buy / sell
-
 ## Screenshots
 <img width="1076" alt="image" src="https://github.com/vtamprateep/equity-researcher/assets/19770736/9d9e59e7-3b86-4505-b05b-8a955ba45fac">
 <img width="1257" alt="image" src="https://github.com/vtamprateep/equity-researcher/assets/19770736/a0198b3e-5746-49c6-a9a0-3fd91365ee4c">
