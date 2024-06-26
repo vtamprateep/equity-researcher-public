@@ -13,7 +13,7 @@ The Stock Research Platform is designed to provide users with a comprehensive an
 - **Language Model**: Cohere.ai (LLM)
 
 ## Getting Started
-You can preview the website here: [http://3.142.146.107:3000/](http://3.142.146.107:3000/)
+You can preview the website here: [https://equity-researcher.vercel.app/](https://equity-researcher.vercel.app/)
 
 ## Key Features
 - **Hierarchical Navigation**: Users can drill down from market indices to individual stocks by clicking on drill down stock cards.
@@ -36,6 +36,7 @@ You can preview the website here: [http://3.142.146.107:3000/](http://3.142.146.
 
 ## Updates & Changes
 ### June 2024
+- Migrate web application to Vercel platform with HTTPS encryption.
 - Implemented authentication flow using Supabase, allowing users to create accounts and log-in.
 - Implemented daily summary metrics at bottom of stock charts, updated daily.
 
