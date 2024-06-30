@@ -36,6 +36,8 @@ You can preview the website here: [https://equity-researcher.vercel.app/](https:
 
 ## Updates & Changes
 ### June 2024
+- Created navigation side bar, allowing users to navigate pages and log-out.
+- Added watchlist functionality, allowing users to add equities to watchlist in Charts page and view symbol IDs in watchlist page
 - Migrate web application to Vercel platform with HTTPS encryption.
 - Implemented authentication flow using Supabase, allowing users to create accounts and log-in.
 - Implemented daily summary metrics at bottom of stock charts, updated daily.
